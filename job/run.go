@@ -53,7 +53,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	defer outfh.Close()
 
 	// log line for job
-	fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%s\n",
+	fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d\n",
 		job.JobId, runSpec.RunId)
 
 	for step_idx, step := range job.Steps {
