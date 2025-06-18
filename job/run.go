@@ -1,0 +1,170 @@
+package job
+
+import (
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"log/slog"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"sort"
+	"strconv"
+)
+
+type RunJob struct {
+	JobSpec *JobSpec
+}
+
+func (me *RunJob) Run() (*RunSpec, error) {
+	return Run(me.JobSpec)
+}
+
+func Run(job *JobSpec) (*RunSpec, error) {
+
+	rundir_base := filepath.Join(job.Directory, "run")
+	runid, err := getMaxRun(rundir_base)
+	if err != nil {
+		return nil, err
+	}
+	runid = runid + 1
+	rundir := filepath.Join(rundir_base, fmt.Sprintf("%d", runid))
+	os.MkdirAll(rundir, 0700)
+
+	runSpec := &RunSpec{
+		JobId:  job.JobId,
+		RunId:  runid,
+		RunDir: rundir,
+	}
+
+	if len(job.Steps) == 0 {
+		return nil, fmt.Errorf("Job has no steps: jid:%s", job.JobId)
+	}
+
+	// open output file for job
+	open_flags := os.O_APPEND | os.O_CREATE | os.O_WRONLY
+	stdoutpath := filepath.Join(runSpec.RunDir, "job.log")
+	outfh, err := os.OpenFile(stdoutpath, open_flags, 0644)
+	if err != nil {
+		return nil, err
+	}
+	runSpec.LogFile = outfh
+
+	defer outfh.Close()
+
+	// log line for job
+	fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%s\n",
+		job.JobId, runSpec.RunId)
+
+	for step_idx, step := range job.Steps {
+
+		stepRes := &StepResult{
+			Id:    step.Id,
+			Index: step_idx,
+			Step:  step,
+		}
+		runSpec.StepResults = append(runSpec.StepResults, stepRes)
+
+		fmt.Fprintf(runSpec.LogFile, "\nrun step jid:%s step_num:%d: name:%s\n",
+			job.JobId, step_idx, step.Id)
+
+		job_type := "unknown"
+		if step.Shell != nil {
+			job_type = "shell"
+		}
+
+		if job_type == "unknown" {
+			slog.Warn("Unknown job type", "job_type", job_type)
+			continue
+		}
+
+		err := RunShell(runSpec, step.Id, job, step.Shell)
+		if err != nil {
+			slog.Warn("RunShell", "error", err)
+			stepRes.Error = err.Error()
+
+			var ee *exec.ExitError
+			if errors.As(err, &ee) {
+				fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d: exit error %s\n",
+					job.JobId, runSpec.RunId, ee)
+
+			} else {
+				fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d: generic error %s\n",
+					job.JobId, runSpec.RunId, err)
+
+			}
+		}
+
+	}
+
+	// purge runs
+	if job.Keep > 0 {
+		err = purgeRuns(rundir_base, job.Keep)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return runSpec, nil
+}
+
+// return the highest integer directory in the jobs rundir
+func getMaxRun(rundir string) (int, error) {
+	ret := 0
+
+	files, err := ioutil.ReadDir(rundir)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, file := range files {
+		if !file.IsDir() {
+			continue
+		}
+		_val, err := strconv.ParseInt(file.Name(), 10, 32)
+		if err != nil {
+			continue
+		}
+		val := int(_val)
+		if val > ret {
+			ret = val
+		}
+	}
+
+	return ret, nil
+}
+func purgeRuns(rundir string, keep int) error {
+	files, err := ioutil.ReadDir(rundir)
+	if err != nil {
+		return err
+	}
+	names := make([]string, 0)
+
+	for _, file := range files {
+		if !file.IsDir() {
+			continue
+		}
+		_, err := strconv.ParseInt(file.Name(), 10, 32)
+		if err != nil {
+			continue
+		}
+		names = append(names, file.Name())
+	}
+
+	sort.Slice(names, func(i, j int) bool {
+		a, _ := strconv.ParseInt(names[i], 10, 32)
+		b, _ := strconv.ParseInt(names[j], 10, 32)
+		return a > b
+	})
+
+	// slog.Debug("considering purge on names", "names", names)
+
+	for idx, name := range names {
+		dir := filepath.Join(rundir, name)
+		if idx+1 > keep {
+			slog.Debug("Purge run directory", "dir", dir)
+			os.RemoveAll(dir)
+		}
+	}
+	return nil
+}

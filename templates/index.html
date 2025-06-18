@@ -1,0 +1,12 @@
+{{define "index"}}
+{{template "header" . }}
+<h1>jobd</h1>
+
+{{range .Jobs}}
+<div class="item">
+    <span class="job"><a href="/ui/job/{{.JobId}}">{{ .JobId }}</a></span>
+    <span class="status">SUCCESS</status></span>
+</div>
+{{end}}
+{{template "footer" . }}
+{{end}}

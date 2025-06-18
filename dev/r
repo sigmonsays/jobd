@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -x
+gi || exit 1
+
+#reflex -s -r '\.go$' -r '\.html$' -- jobd -loglevel debug -config ~/jobd.yaml "$@"
+
+exec reflex -s -r '(\.html$|\.go$)' -- build-and-run "$@"
