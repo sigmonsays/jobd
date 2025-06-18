@@ -20,8 +20,6 @@ func NewExecutor() *Executor {
 type Executor struct {
 	mx sync.Mutex
 
-	Jobs []*Job
-
 	results map[string]*Result
 }
 
