@@ -49,8 +49,10 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 	data := &ViewJobPage{
 		Title:      fmt.Sprintf("job %s", jid),
 		Job:        jobSpec,
-		RunSpec:    jresult.RunSpec,
 		Incomplete: incomplete,
+	}
+	if jresult != nil {
+		data.RunSpec = jresult.RunSpec
 	}
 
 	if shedJob != nil {

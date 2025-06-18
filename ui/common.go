@@ -12,8 +12,9 @@ import (
 func (me *Ui) getTemplates() (*template.Template, error) {
 	// setup functions
 	fmap := map[string]any{
-		"tojson": tojson,
-		"escape": html.EscapeString,
+		"version": app_version,
+		"tojson":  tojson,
+		"escape":  html.EscapeString,
 	}
 	tmpl, err := template.New("jobd").
 		Funcs(fmap).
@@ -23,6 +24,10 @@ func (me *Ui) getTemplates() (*template.Template, error) {
 	}
 
 	return tmpl, err
+}
+func app_version() string {
+	// todo
+	return "dev"
 }
 
 func tojson(x any) (string, error) {

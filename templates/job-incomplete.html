@@ -1,13 +1,17 @@
-{{define "job"}}
+{{define "job-incomplete"}}
 {{template "header" . }}
-<h1>job {{ .Job.JobId }} (incomplete) < ()/h1>
+<h1>job {{ .Job.JobId }} (incomplete) </h1>
 
 Next {{ .NextRun | tojson }}<p>
 
 <h2>Run Detail</h2>
 
 <pre>
+{{ if .RunSpec }}
 {{ .RunSpec.GetLastLogs 1000 | escape }}
+{{ else }}
+    <b>No run spec</b>
+{{ end }}
 </pre>
 
 

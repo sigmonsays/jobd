@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime/debug"
 )
 
 func RecoveryHandler(nextfn http.HandlerFunc) http.HandlerFunc {
@@ -16,6 +17,8 @@ func RecoveryHandler(nextfn http.HandlerFunc) http.HandlerFunc {
 				jsonBody, _ := json.Marshal(map[string]string{
 					"error": "There was an internal server error",
 				})
+
+				fmt.Printf("\nPanic caught!:\n%s\n", debug.Stack())
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusInternalServerError)
