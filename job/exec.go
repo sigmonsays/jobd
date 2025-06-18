@@ -54,7 +54,11 @@ func (me *Exec) Init() error {
 	}
 	slog.Debug("switching command", "cmd", me.Command)
 	slog.Debug("writing script", "script", scriptfile)
-	os.WriteFile(scriptfile, []byte(me.Script), 0755)
+
+	prepend := "#!/usr/bin/env bash\n"
+	prepend += "set -x\n\n"
+
+	os.WriteFile(scriptfile, []byte(prepend+me.Script), 0755)
 
 	return nil
 }
