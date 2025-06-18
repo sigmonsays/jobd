@@ -109,8 +109,8 @@ func run(cfg *config.AppConfig, opts *Options) error {
 	static := http.FileServer(http.Dir("static"))
 	mx.Handle("/static/", http.StripPrefix("/static/", static))
 
-	mx.HandleFunc("/ui", webui.Index)
-	mx.HandleFunc("/ui/job/{jid}", webui.ViewJob)
+	mx.HandleFunc("/ui", api.RecoveryHandler(webui.Index))
+	mx.HandleFunc("/ui/job/{jid}", api.RecoveryHandler(webui.ViewJob))
 
 	httpsrv := http.Server{
 		Addr:    cfg.HttpAddr,

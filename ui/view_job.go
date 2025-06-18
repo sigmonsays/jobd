@@ -34,15 +34,11 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 	// ensure we have a scheduled job
 	shedJob, err := me.Context.Scheduler.FindJobByName(jid)
 	if err != nil {
-		me.handleError(w, r, err)
-		return
 	}
 
 	// ensure we have a executing job
 	jresult, err := me.Context.Executor.GetResult(jid)
 	if err != nil {
-		me.handleError(w, r, err)
-		return
 	}
 
 	incomplete := false
@@ -51,7 +47,7 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := &ViewJobPage{
-		Title:      fmt.Sprintf("jobd - %s", jid),
+		Title:      fmt.Sprintf("job %s", jid),
 		Job:        jobSpec,
 		RunSpec:    jresult.RunSpec,
 		Incomplete: incomplete,
@@ -70,9 +66,14 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	template_name := "job"
+	if incomplete {
+		template_name = "job-incomplete"
+	}
+
 	w.Header().Add("Content-Type", "text/html")
 	w.WriteHeader(200)
-	err = tmpl.ExecuteTemplate(w, "job", data)
+	err = tmpl.ExecuteTemplate(w, template_name, data)
 	if err != nil {
 		slog.Warn("Execute", "e", err)
 	}
