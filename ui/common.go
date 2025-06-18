@@ -7,11 +7,13 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"time"
 )
 
 func (me *Ui) getTemplates() (*template.Template, error) {
 	// setup functions
 	fmap := map[string]any{
+		"now":     me.Now,
 		"version": app_version,
 		"tojson":  tojson,
 		"escape":  html.EscapeString,
@@ -28,6 +30,10 @@ func (me *Ui) getTemplates() (*template.Template, error) {
 func app_version() string {
 	// todo
 	return "dev"
+}
+
+func (me *Ui) Now() string {
+	return time.Now().Format(time.RFC3339)
 }
 
 func tojson(x any) (string, error) {

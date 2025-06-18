@@ -1,8 +1,12 @@
 {{define "job"}}
 {{template "header" . }}
+<meta http-equiv="refresh" content="30">
+
 <h1>job {{ .Job.JobId }}</h1>
 
-Next {{ .NextRun | tojson }}<p>
+Today {{ now }}<br>
+Prev {{ .NextRun.Prev }}<br>
+Next {{ .NextRun.Next }}<br>
 
 <h2>Run Detail</h2>
 
