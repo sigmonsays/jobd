@@ -13,6 +13,7 @@ type ViewJobPage struct {
 	Title      string
 	Job        *job.JobSpec
 	RunSpec    *job.RunSpec
+	RunShed    *schedule.Job
 	Incomplete bool
 	NextRun    *schedule.Next
 }
@@ -49,6 +50,7 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 	data := &ViewJobPage{
 		Title:      fmt.Sprintf("job %s", jid),
 		Job:        jobSpec,
+		RunShed:    shedJob,
 		Incomplete: incomplete,
 	}
 	if jresult != nil {

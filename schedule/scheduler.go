@@ -95,7 +95,8 @@ func (me *CronJob) Run() {
 
 func (me *Scheduler) AddJob(j *Job) error {
 	me.Jobs = append(me.Jobs, j)
-	eid, err := me.c.AddJob(j.Schedule, &CronJob{j})
+	cj := &CronJob{j}
+	eid, err := me.c.AddJob(j.Schedule, cj)
 	slog.Info("Scheduled job", "jid", j.Id, "eid", eid)
 
 	me.saveJob(j, int(eid))
@@ -126,16 +127,26 @@ func NewJob() *Job {
 }
 
 type Job struct {
+	mx       sync.Mutex
 	Eid      int
 	Id       string
 	Schedule string
-	Fn       func() error
+	Fn       func() error `json:"-"`
+	Running  bool
 }
 
 func (me *Job) SetEid(eid int) {
 	me.Eid = eid
 }
 
+func (me *Job) SetRunning(running bool) {
+	me.mx.Lock()
+	defer me.mx.Unlock()
+	me.Running = running
+}
+
 func (me *Job) Run() error {
+	me.SetRunning(true)
+	defer me.SetRunning(false)
 	return me.Fn()
 }
