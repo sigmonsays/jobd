@@ -4,28 +4,40 @@ import (
 	"log/slog"
 )
 
-func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) error {
+type ShellResult struct {
+	ExitCode int
+	// todo: Return more things
+}
+
+func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*ShellResult, error) {
 	ex, err := NewExec(sh.Script)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	ret := &ShellResult{}
+
 	// todo ex.Env
-	// todo timeout
+	// todo cwd
 	ex.FileLog = runSpec.LogFile
+	ex.Timeout = sh.Timeout
+	ex.Dir = sh.WorkingDir
 
 	ex.ScriptDir = job.Directory
 	ex.LogDir = runSpec.RunDir
 	err = ex.Init()
 	if err != nil {
-		return err
+		return ret, err
 	}
 
 	err = ex.Run()
+
+	ret.ExitCode = ex.ExitCode
+
 	if err != nil {
-		return err
+		return ret, err
 	}
 
 	slog.Debug("exec returned", "jid", runSpec.JobId, "rid", runSpec.RunId, "step", step, "exitcode", ex.ExitCode)
-	return nil
+	return ret, nil
 }

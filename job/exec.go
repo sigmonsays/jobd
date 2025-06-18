@@ -22,6 +22,9 @@ type Exec struct {
 	// where we log
 	FileLog io.Writer
 
+	// directory to enter
+	Dir string
+
 	// where we store job.sh
 	ScriptDir string
 	// where logs go
@@ -84,6 +87,7 @@ func (me *Exec) buildCommand(ctx context.Context) (*exec.Cmd, func()) {
 	slog.Debug("execute command", "cmdline", cmdline, "timeout", me.Timeout)
 
 	c := exec.CommandContext(ctx, cmdline[0], cmdline[1:]...)
+	c.Dir = me.Dir
 	c.Stderr = os.Stderr
 	env := make([]string, 0)
 	env = append(env, os.Environ()...)

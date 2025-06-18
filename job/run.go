@@ -78,8 +78,15 @@ func Run(job *JobSpec) (*RunSpec, error) {
 			continue
 		}
 
-		err := RunShell(runSpec, step.Id, job, step.Shell)
-		if err != nil {
+		shres, err := RunShell(runSpec, step.Id, job, step.Shell)
+		if shres != nil {
+			fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d finished, exited %d\n",
+				job.JobId, runSpec.RunId, shres.ExitCode)
+		}
+		if err == nil {
+			fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d finished, exited %d\n",
+				job.JobId, runSpec.RunId, shres.ExitCode)
+		} else {
 			slog.Warn("RunShell", "error", err)
 			stepRes.Error = err.Error()
 
