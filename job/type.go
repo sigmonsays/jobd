@@ -45,6 +45,9 @@ type JobSpec struct {
 
 	// run schedule
 	Schedule string
+
+	// variables to capture
+	Vars []*VarsSpec
 }
 
 type JobStep struct {
@@ -102,3 +105,9 @@ type StepResult struct {
 	Step  *JobStep
 	Error string
 }
+
+type VarsSpec struct {
+	FromCommand []*CommandVarSpec `yaml:"from_command"`
+}
+
+type CommandVarSpec map[string]string
