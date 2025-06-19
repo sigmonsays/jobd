@@ -66,10 +66,11 @@ func (me *Exec) Init() error {
 	return nil
 }
 
-func (me *Exec) buildCommand(ctx context.Context) (*exec.Cmd, func()) {
+func (me *Exec) buildCommand(ctx context.Context) (*exec.Cmd, func(), context.Context) {
 	var cancel func()
 
 	if me.Timeout > 0 {
+		slog.Debug("build command with timeout", "timeout", me.Timeout)
 		ctx2, cancel2 := context.WithTimeout(ctx, time.Duration(me.Timeout)*time.Second)
 		cancel = func() {
 			if cancel2 == nil {
@@ -99,7 +100,7 @@ func (me *Exec) buildCommand(ctx context.Context) (*exec.Cmd, func()) {
 	if cancel == nil {
 		cancel = func() {}
 	}
-	return c, cancel
+	return c, cancel, ctx
 }
 
 func (me *Exec) Run() error {
@@ -107,7 +108,7 @@ func (me *Exec) Run() error {
 	now := time.Now()
 
 	ctx := context.Background()
-	c, cancel := me.buildCommand(ctx)
+	c, cancel, ctx := me.buildCommand(ctx)
 	defer cancel()
 
 	c.Stdout = me.FileLog
@@ -118,8 +119,16 @@ func (me *Exec) Run() error {
 	dur := time.Since(now)
 	me.ExecuteTimeMs = int64(dur.Nanoseconds() / 1000000)
 
+	now2 := time.Now()
+	deadline, deadline_set := ctx.Deadline()
+	if deadline_set && deadline.After(now2) {
+		me.TimedOut = true
+		slog.Debug("exec run: context deadline exceeded")
+	}
+
 	if ctx.Err() == context.DeadlineExceeded {
 		me.TimedOut = true
+		slog.Debug("exec run: context deadline exceeded")
 	}
 
 	if err != nil {

@@ -1,7 +1,9 @@
 package job
 
 import (
+	"fmt"
 	"io"
+	"log/slog"
 	"path/filepath"
 )
 
@@ -75,6 +77,12 @@ type RunSpec struct {
 func (me *RunSpec) GetLogFile() string {
 	logfile := filepath.Join(me.RunDir, "job.log")
 	return logfile
+}
+
+func (me *RunSpec) Logf(s string, args ...any) {
+	fmt.Fprintf(me.LogFile, s, args...)
+	msg := fmt.Sprintf(s, args...)
+	slog.Debug("Logf", "msg", msg)
 }
 
 type StepResult struct {

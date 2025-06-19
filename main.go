@@ -194,7 +194,6 @@ func SetJobDefaults(cfg *config.AppConfig) error {
 		for idx, step := range job.Steps {
 			step_num := idx + 1
 			if step.Shell != nil {
-
 				if step.Shell.Timeout == 0 {
 					step.Shell.Timeout = cfg.ShellDefaults.Timeout
 				}

@@ -6,6 +6,7 @@ import (
 
 type ShellResult struct {
 	ExitCode int
+	TimedOut bool
 	// todo: Return more things
 }
 
@@ -33,6 +34,7 @@ func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*Shel
 	err = ex.Run()
 
 	ret.ExitCode = ex.ExitCode
+	ret.TimedOut = ex.TimedOut
 
 	if err != nil {
 		return ret, err

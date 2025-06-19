@@ -10,8 +10,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
-
-	"github.com/sigmonsays/jobd/util"
 )
 
 type RunJob struct {
@@ -55,7 +53,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	defer outfh.Close()
 
 	// log line for job
-	fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d\n",
+	runSpec.Logf("run job jid:%s runid:%d\n",
 		job.JobId, runSpec.RunId)
 
 	for step_idx, step := range job.Steps {
@@ -67,7 +65,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 		}
 		runSpec.StepResults = append(runSpec.StepResults, stepRes)
 
-		fmt.Fprintf(runSpec.LogFile, "\nrun step jid:%s step_num:%d: name:%s\n",
+		runSpec.Logf("\nrun step jid:%s step_num:%d: name:%s\n",
 			job.JobId, step_idx, step.Id)
 
 		job_type := "unknown"
@@ -83,25 +81,31 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 		shres, err := RunShell(runSpec, step.Id, job, step.Shell)
 		if shres != nil {
-			fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d finished, exited %d\n",
-				job.JobId, runSpec.RunId, shres.ExitCode)
+
+			if shres.TimedOut {
+				runSpec.Logf("run job jid:%s runid:%d timed out, exited %d\n",
+					job.JobId, runSpec.RunId, shres.ExitCode)
+
+			} else {
+				runSpec.Logf("run job jid:%s runid:%d finished, exited %d\n",
+					job.JobId, runSpec.RunId, shres.ExitCode)
+
+			}
 		}
 		if err == nil {
-			fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d finished, exited %d\n",
+			runSpec.Logf("run job jid:%s runid:%d finished, exited %d\n",
 				job.JobId, runSpec.RunId, shres.ExitCode)
 		} else {
 			slog.Warn("RunShell", "error", err)
 			stepRes.Error = err.Error()
 
-			util.DebugError(err)
-
 			var ee *exec.ExitError
 			if errors.As(err, &ee) {
-				fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d: exit error %s\n",
+				runSpec.Logf("run job jid:%s runid:%d: exit error %s\n",
 					job.JobId, runSpec.RunId, ee)
 
 			} else {
-				fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d: generic error %s\n",
+				runSpec.Logf("run job jid:%s runid:%d: generic error %s\n",
 					job.JobId, runSpec.RunId, err)
 			}
 		}
