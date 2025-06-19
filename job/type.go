@@ -57,6 +57,8 @@ type ShellSpec struct {
 	// the working directory
 	WorkingDir string
 
+	Env []string
+
 	// the command to run
 	Script string
 

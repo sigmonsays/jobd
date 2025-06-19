@@ -23,6 +23,7 @@ func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*Shel
 	ex.FileLog = runSpec.LogFile
 	ex.Timeout = sh.Timeout
 	ex.Dir = sh.WorkingDir
+	ex.Env = sh.Env
 
 	ex.ScriptDir = job.Directory
 	ex.LogDir = runSpec.RunDir
