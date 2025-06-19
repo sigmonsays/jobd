@@ -22,6 +22,8 @@ type Exec struct {
 	// where we log
 	FileLog io.Writer
 
+	ImmediateExit bool // exit immediately on command exit non-zero (set -e)
+
 	// directory to enter
 	Dir string
 
@@ -59,7 +61,11 @@ func (me *Exec) Init() error {
 	slog.Debug("writing script", "script", scriptfile)
 
 	prepend := "#!/usr/bin/env bash\n"
-	prepend += "set -x\n\n"
+	prepend += "set -x\n"
+	if me.ImmediateExit {
+		prepend += "set -e\n"
+	}
+	prepend += "\n"
 
 	os.WriteFile(scriptfile, []byte(prepend+me.Script), 0755)
 

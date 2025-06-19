@@ -68,6 +68,9 @@ type ShellSpec struct {
 	// the command to run
 	Script string
 
+	// Exit immediately if command exits non-zero (set -e)
+	ImmediateExit bool
+
 	// execution timeout
 	Timeout int
 }
