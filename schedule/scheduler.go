@@ -90,7 +90,7 @@ type CronJob struct {
 }
 
 func (me *CronJob) Run() {
-	me.Job.Fn()
+	go me.Job.Fn()
 }
 
 func (me *Scheduler) AddJob(j *Job) error {

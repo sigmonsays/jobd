@@ -14,11 +14,15 @@ import (
 func NewExecutor() *Executor {
 	return &Executor{
 		results: make(map[string]*Result, 0),
+		running: make(map[string]bool, 0),
 	}
 }
 
 type Executor struct {
-	mx sync.Mutex
+	claimLock sync.Mutex
+	mx        sync.Mutex
+
+	running map[string]bool
 
 	results map[string]*Result
 }
@@ -27,9 +31,38 @@ type Runnable interface {
 	Run() (*job.RunSpec, error)
 }
 
+func (me *Executor) unclaimJid(jid string) error {
+	me.claimLock.Lock()
+	defer me.claimLock.Unlock()
+	delete(me.running, jid)
+	return nil
+}
+
+func (me *Executor) claimJid(jid string) error {
+	me.claimLock.Lock()
+	defer me.claimLock.Unlock()
+
+	_, found := me.running[jid]
+	if found {
+		return fmt.Errorf("already running")
+	}
+
+	me.running[jid] = true
+	return nil
+}
+
 func (me *Executor) Execute(jid string, f Runnable) error {
 	started := time.Now()
 
+	// claim this slot so it only runs once
+	err := me.claimJid(jid)
+	if err != nil {
+		slog.Debug("unable to claim job, already running", "jid", jid)
+		return err
+	}
+	defer me.unclaimJid(jid)
+
+	// begin executing job
 	slog.Debug("Execute job", "jid", jid)
 	runSpec, err := f.Run()
 	res := &Result{
