@@ -18,8 +18,6 @@ func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*Shel
 
 	ret := &ShellResult{}
 
-	// todo ex.Env
-	// todo cwd
 	ex.FileLog = runSpec.LogFile
 	ex.Timeout = sh.Timeout
 	ex.Dir = sh.WorkingDir
