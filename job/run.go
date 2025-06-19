@@ -143,7 +143,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 	}
 
-	err = captureVariables(job.Vars, runSpec)
+	err = captureVariables(job.Vars, runSpec, runSpec.Vars.Global)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	return runSpec, nil
 }
 
-func captureVariables(vars_spec []*JobVars, runSpec *RunSpec) error {
+func captureVariables(vars_spec []*JobVars, runSpec *RunSpec, vars *VarSet) error {
 
 	// capture variables
 	for _, jv := range vars_spec {
@@ -185,7 +185,7 @@ func captureVariables(vars_spec []*JobVars, runSpec *RunSpec) error {
 				val := strings.Trim(buf.String(), " \n\t")
 
 				slog.Debug("command variable result", "variable", var_name, "value", val)
-
+				vars.SetVar(var_name, val)
 			}
 		}
 

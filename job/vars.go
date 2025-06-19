@@ -18,14 +18,15 @@ type Vars struct {
 	Step   map[string]*VarSet
 }
 
-func (me *Vars) SetStep(step string, k string, v string) {
+func (me *Vars) GetStep(step string) *VarSet {
 	vars, found := me.Step[step]
 	if !found {
 		vars = NewVarSet()
+		me.Step[step] = vars
 	}
-
-	vars.SetVar(k, v)
+	return vars
 }
+
 func NewVarSet() *VarSet {
 	return &VarSet{
 		Vars: make(map[string]Var, 0),

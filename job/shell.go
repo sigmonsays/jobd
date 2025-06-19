@@ -11,7 +11,6 @@ type ShellResult struct {
 }
 
 func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*ShellResult, error) {
-
 	slog.Debug("RunShell", "jid", job.JobId, "rid", runSpec.RunId, "dir", sh.WorkingDir)
 	ex, err := NewExec(sh.Script)
 	if err != nil {
@@ -42,5 +41,11 @@ func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*Shel
 	}
 
 	slog.Debug("exec returned", "jid", runSpec.JobId, "rid", runSpec.RunId, "step", step, "exitcode", ex.ExitCode)
+
+	err = captureVariables(job.Vars, runSpec, runSpec.Vars.GetStep(step))
+	if err != nil {
+		return nil, err
+	}
+
 	return ret, nil
 }
