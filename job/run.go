@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+
+	"github.com/sigmonsays/jobd/util"
 )
 
 type RunJob struct {
@@ -75,6 +77,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 		if job_type == "unknown" {
 			slog.Warn("Unknown job type", "job_type", job_type)
+			stepRes.Error = "unknown job type"
 			continue
 		}
 
@@ -90,6 +93,8 @@ func Run(job *JobSpec) (*RunSpec, error) {
 			slog.Warn("RunShell", "error", err)
 			stepRes.Error = err.Error()
 
+			util.DebugError(err)
+
 			var ee *exec.ExitError
 			if errors.As(err, &ee) {
 				fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d: exit error %s\n",
@@ -98,7 +103,6 @@ func Run(job *JobSpec) (*RunSpec, error) {
 			} else {
 				fmt.Fprintf(runSpec.LogFile, "run job jid:%s runid:%d: generic error %s\n",
 					job.JobId, runSpec.RunId, err)
-
 			}
 		}
 
