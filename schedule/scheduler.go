@@ -144,9 +144,3 @@ func (me *Job) SetRunning(running bool) {
 	defer me.mx.Unlock()
 	me.Running = running
 }
-
-func (me *Job) Run() error {
-	me.SetRunning(true)
-	defer me.SetRunning(false)
-	return me.Fn()
-}

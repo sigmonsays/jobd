@@ -168,6 +168,9 @@ func run(cfg *config.AppConfig, opts *Options) error {
 		j.Id = job_spec.JobId
 		j.Schedule = job_spec.Schedule
 		j.Fn = func() error {
+			j.SetRunning(true)
+			defer j.SetRunning(false)
+
 			return exec.Execute(job_spec.JobId, rj)
 		}
 		sched.AddJob(j)
