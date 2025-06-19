@@ -53,7 +53,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	defer outfh.Close()
 
 	// log line for job
-	runSpec.Logf("run job jid:%s runid:%d\n",
+	runSpec.Logf("run job jid:%s runid:%d",
 		job.JobId, runSpec.RunId)
 
 	for step_idx, step := range job.Steps {
@@ -65,7 +65,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 		}
 		runSpec.StepResults = append(runSpec.StepResults, stepRes)
 
-		runSpec.Logf("\nrun step jid:%s step_num:%d: name:%s\n",
+		runSpec.Logf("run step jid:%s step_num:%d: name:%s",
 			job.JobId, step_idx, step.Id)
 
 		job_type := "unknown"
@@ -81,21 +81,21 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 		shres, err := RunShell(runSpec, step.Id, job, step.Shell)
 		if shres != nil {
-			runSpec.Logf("run job jid:%s runid:%d finished; exitcode:%d timedout:%v\n",
+			runSpec.Logf("run job jid:%s runid:%d finished; exitcode:%d timedout:%v",
 				job.JobId, runSpec.RunId, shres.ExitCode, shres.TimedOut)
 
 			if shres.TimedOut {
-				runSpec.Logf("run job jid:%s runid:%d timed out, exited %d\n",
+				runSpec.Logf("run job jid:%s runid:%d timed out, exited %d",
 					job.JobId, runSpec.RunId, shres.ExitCode)
 
 			} else {
-				runSpec.Logf("run job jid:%s runid:%d finished, exited %d\n",
+				runSpec.Logf("run job jid:%s runid:%d finished, exited %d",
 					job.JobId, runSpec.RunId, shres.ExitCode)
 
 			}
 		}
 		if err == nil {
-			runSpec.Logf("run job jid:%s runid:%d finished, exited %d\n",
+			runSpec.Logf("run job jid:%s runid:%d finished, exited %d",
 				job.JobId, runSpec.RunId, shres.ExitCode)
 		} else {
 			slog.Warn("RunShell", "error", err)
@@ -103,11 +103,11 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 			var ee *exec.ExitError
 			if errors.As(err, &ee) {
-				runSpec.Logf("run job jid:%s runid:%d: exit error %s\n",
+				runSpec.Logf("run job jid:%s runid:%d: exit error %s",
 					job.JobId, runSpec.RunId, ee)
 
 			} else {
-				runSpec.Logf("run job jid:%s runid:%d: generic error %s\n",
+				runSpec.Logf("run job jid:%s runid:%d: generic error %s",
 					job.JobId, runSpec.RunId, err)
 			}
 		}

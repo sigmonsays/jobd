@@ -81,7 +81,7 @@ func (me *RunSpec) GetLogFile() string {
 
 func (me *RunSpec) Logf(s string, args ...any) {
 	fmt.Fprintf(me.LogFile, s, args...)
-	msg := fmt.Sprintf(s, args...)
+	msg := fmt.Sprintf("#### "+s+"\n", args...)
 	slog.Debug("Logf", "msg", msg)
 }
 
