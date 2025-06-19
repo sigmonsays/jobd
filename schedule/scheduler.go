@@ -133,14 +133,25 @@ type Job struct {
 	Schedule string
 	Fn       func() error `json:"-"`
 	Running  bool
+
+	Started time.Time
+	Stopped time.Time
 }
 
 func (me *Job) SetEid(eid int) {
 	me.Eid = eid
 }
 
+var zeroTime time.Time
+
 func (me *Job) SetRunning(running bool) {
 	me.mx.Lock()
 	defer me.mx.Unlock()
+	if running {
+		me.Started = time.Now()
+		me.Stopped = zeroTime
+	} else {
+		me.Stopped = time.Now()
+	}
 	me.Running = running
 }
