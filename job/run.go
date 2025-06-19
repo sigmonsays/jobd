@@ -81,6 +81,8 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 		shres, err := RunShell(runSpec, step.Id, job, step.Shell)
 		if shres != nil {
+			runSpec.Logf("run job jid:%s runid:%d finished; exitcode:%d timedout:%v\n",
+				job.JobId, runSpec.RunId, shres.ExitCode, shres.TimedOut)
 
 			if shres.TimedOut {
 				runSpec.Logf("run job jid:%s runid:%d timed out, exited %d\n",
