@@ -53,6 +53,8 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	vars.Global.SetVar("RUNDIR", rundir)
 	vars.Global.SetVar("WORKSPACE", workdir)
 
+	slog.Debug("run job", "rundir", rundir, "workdir", workdir)
+
 	if len(job.Steps) == 0 {
 		return nil, fmt.Errorf("Job has no steps: jid:%s", job.JobId)
 	}
