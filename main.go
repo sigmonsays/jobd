@@ -156,6 +156,10 @@ func run(cfg *config.AppConfig, opts *Options) error {
 	// start jobs
 	for _, job_spec := range cfg.Jobs {
 
+		if job_spec.Disabled {
+			continue
+		}
+
 		rj := &job.RunJob{
 			JobSpec: job_spec,
 		}

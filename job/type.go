@@ -25,6 +25,9 @@ type JobSpec struct {
 	// job id (JID)
 	JobId string
 
+	// disable this job
+	Disabled bool
+
 	// immediately run the job
 	Immediate bool
 
@@ -48,6 +51,9 @@ type JobStep struct {
 
 	// the step id, optional
 	Id string
+
+	// disable this step
+	Disabled bool
 
 	Shell *ShellSpec
 }

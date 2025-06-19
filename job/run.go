@@ -58,6 +58,11 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 	for step_idx, step := range job.Steps {
 
+		if step.Disabled {
+			runSpec.Logf("run step jid:%s step_num:%d: name:%s: step is disabled, skipping",
+				job.JobId, step_idx, step.Id)
+		}
+
 		stepRes := &StepResult{
 			Id:    step.Id,
 			Index: step_idx,
