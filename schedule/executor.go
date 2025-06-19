@@ -51,16 +51,26 @@ func (me *Executor) claimJid(jid string) error {
 	return nil
 }
 
-func (me *Executor) Execute(jid string, f Runnable) error {
+func DefaultExecuteOptions() *ExecuteOptions {
+	return &ExecuteOptions{}
+}
+
+type ExecuteOptions struct {
+	Stackable bool
+}
+
+func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error {
 	started := time.Now()
 
-	// claim this slot so it only runs once
-	err := me.claimJid(jid)
-	if err != nil {
-		slog.Debug("unable to claim job, already running", "jid", jid)
-		return err
+	if opts.Stackable == false {
+		// claim this slot so it only runs once
+		err := me.claimJid(jid)
+		if err != nil {
+			slog.Debug("unable to claim job, already running", "jid", jid)
+			return err
+		}
+		defer me.unclaimJid(jid)
 	}
-	defer me.unclaimJid(jid)
 
 	// begin executing job
 	slog.Debug("Execute job", "jid", jid)

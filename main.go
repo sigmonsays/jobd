@@ -170,14 +170,18 @@ func run(cfg *config.AppConfig, opts *Options) error {
 		j.Fn = func() error {
 			j.SetRunning(true)
 			defer j.SetRunning(false)
+			opts := schedule.DefaultExecuteOptions()
+			opts.Stackable = job_spec.Stackable
 
-			return exec.Execute(job_spec.JobId, rj)
+			return exec.Execute(job_spec.JobId, rj, opts)
 		}
 		sched.AddJob(j)
 
 		if job_spec.Immediate {
 			go func() {
-				exec.Execute(j.Id, rj)
+				opts := schedule.DefaultExecuteOptions()
+				opts.Stackable = job_spec.Stackable
+				exec.Execute(j.Id, rj, opts)
 			}()
 		}
 	}
