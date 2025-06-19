@@ -21,21 +21,35 @@ func (me *RunJob) Run() (*RunSpec, error) {
 }
 
 func Run(job *JobSpec) (*RunSpec, error) {
-
 	rundir_base := filepath.Join(job.Directory, "run")
 	runid, err := getMaxRun(rundir_base)
 	if err != nil {
 		return nil, err
 	}
 	runid = runid + 1
-	rundir := filepath.Join(rundir_base, fmt.Sprintf("%d", runid))
+	runid_str := fmt.Sprintf("%d", runid)
+	rundir := filepath.Join(rundir_base, runid_str, "")
+	workdir := filepath.Join(rundir, "workspace")
 	os.MkdirAll(rundir, 0700)
+	os.MkdirAll(workdir, 0700)
 
+	// make vars api
+
+	vars := NewVars(job.VarPrefix)
+	vars.SetGlobal("JOBID", job.JobId)
+
+	// build run spe
 	runSpec := &RunSpec{
-		JobId:  job.JobId,
-		RunId:  runid,
-		RunDir: rundir,
+		JobId:   job.JobId,
+		RunId:   runid,
+		RunDir:  rundir,
+		WorkDir: workdir,
+		Vars:    vars,
 	}
+
+	vars.SetGlobal("RUNID", runid_str)
+	vars.SetGlobal("RUNDIR", rundir)
+	vars.SetGlobal("WORKSPACE", workdir)
 
 	if len(job.Steps) == 0 {
 		return nil, fmt.Errorf("Job has no steps: jid:%s", job.JobId)
@@ -84,36 +98,44 @@ func Run(job *JobSpec) (*RunSpec, error) {
 			continue
 		}
 
-		shres, err := RunShell(runSpec, step.Id, job, step.Shell)
-		if shres != nil {
-			runSpec.Logf("run job jid:%s runid:%d finished; exitcode:%d timedout:%v",
-				job.JobId, runSpec.RunId, shres.ExitCode, shres.TimedOut)
+		if job_type == "shell" {
 
-			if shres.TimedOut {
-				runSpec.Logf("run job jid:%s runid:%d timed out, exited %d",
-					job.JobId, runSpec.RunId, shres.ExitCode)
+			if step.Shell.WorkingDir == "" {
+				step.Shell.WorkingDir = runSpec.WorkDir
+			}
 
-			} else {
+			// run shell
+			shres, err := RunShell(runSpec, step.Id, job, step.Shell)
+			if shres != nil {
+				runSpec.Logf("run job jid:%s runid:%d finished; exitcode:%d timedout:%v",
+					job.JobId, runSpec.RunId, shres.ExitCode, shres.TimedOut)
+
+				if shres.TimedOut {
+					runSpec.Logf("run job jid:%s runid:%d timed out, exited %d",
+						job.JobId, runSpec.RunId, shres.ExitCode)
+
+				} else {
+					runSpec.Logf("run job jid:%s runid:%d finished, exited %d",
+						job.JobId, runSpec.RunId, shres.ExitCode)
+
+				}
+			}
+			if err == nil {
 				runSpec.Logf("run job jid:%s runid:%d finished, exited %d",
 					job.JobId, runSpec.RunId, shres.ExitCode)
-
-			}
-		}
-		if err == nil {
-			runSpec.Logf("run job jid:%s runid:%d finished, exited %d",
-				job.JobId, runSpec.RunId, shres.ExitCode)
-		} else {
-			slog.Warn("RunShell", "error", err)
-			stepRes.Error = err.Error()
-
-			var ee *exec.ExitError
-			if errors.As(err, &ee) {
-				runSpec.Logf("run job jid:%s runid:%d: exit error %s",
-					job.JobId, runSpec.RunId, ee)
-
 			} else {
-				runSpec.Logf("run job jid:%s runid:%d: generic error %s",
-					job.JobId, runSpec.RunId, err)
+				slog.Warn("RunShell", "error", err)
+				stepRes.Error = err.Error()
+
+				var ee *exec.ExitError
+				if errors.As(err, &ee) {
+					runSpec.Logf("run job jid:%s runid:%d: exit error %s",
+						job.JobId, runSpec.RunId, ee)
+
+				} else {
+					runSpec.Logf("run job jid:%s runid:%d: generic error %s",
+						job.JobId, runSpec.RunId, err)
+				}
 			}
 		}
 

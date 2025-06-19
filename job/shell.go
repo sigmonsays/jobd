@@ -11,6 +11,8 @@ type ShellResult struct {
 }
 
 func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*ShellResult, error) {
+
+	slog.Debug("RunShell", "jid", job.JobId, "rid", runSpec.RunId, "dir", sh.WorkingDir)
 	ex, err := NewExec(sh.Script)
 	if err != nil {
 		return nil, err

@@ -47,7 +47,8 @@ type JobSpec struct {
 	Schedule string
 
 	// variables to capture
-	Vars []*VarsSpec
+	VarPrefix string
+	Vars      []*VarsSpec
 }
 
 type JobStep struct {
@@ -83,9 +84,12 @@ type RunSpec struct {
 	JobId   string
 	RunId   int
 	RunDir  string
+	WorkDir string
 	LogFile io.Writer `json:"-"`
 
 	StepResults []*StepResult
+
+	Vars *Vars
 }
 
 func (me *RunSpec) GetLogFile() string {
