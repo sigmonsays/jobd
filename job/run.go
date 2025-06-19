@@ -108,23 +108,9 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 			// run shell
 			shres, err := RunShell(runSpec, step.Id, job, step.Shell)
-			if shres != nil {
-				runSpec.Logf("run job jid:%s runid:%d finished; exitcode:%d timedout:%v",
-					job.JobId, runSpec.RunId, shres.ExitCode, shres.TimedOut)
-
-				if shres.TimedOut {
-					runSpec.Logf("run job jid:%s runid:%d timed out, exited %d",
-						job.JobId, runSpec.RunId, shres.ExitCode)
-
-				} else {
-					runSpec.Logf("run job jid:%s runid:%d finished, exited %d",
-						job.JobId, runSpec.RunId, shres.ExitCode)
-
-				}
-			}
 			if err == nil {
-				runSpec.Logf("run job jid:%s runid:%d finished, exited %d",
-					job.JobId, runSpec.RunId, shres.ExitCode)
+				runSpec.Logf("run job jid:%s runid:%d finished, exited %d, timedout %v",
+					job.JobId, runSpec.RunId, shres.ExitCode, shres.TimedOut)
 			} else {
 				slog.Warn("RunShell", "error", err)
 				stepRes.Error = err.Error()
