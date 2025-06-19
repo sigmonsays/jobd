@@ -48,7 +48,7 @@ type JobSpec struct {
 
 	// variables to capture
 	VarPrefix string
-	Vars      []*VarsSpec
+	Vars      []*JobVars
 }
 
 type JobStep struct {
@@ -60,6 +60,7 @@ type JobStep struct {
 	Disabled bool
 
 	Shell *ShellSpec
+	Vars  []*JobVars
 }
 
 type ShellSpec struct {
@@ -110,8 +111,8 @@ type StepResult struct {
 	Error string
 }
 
-type VarsSpec struct {
-	FromCommand []*CommandVarSpec `yaml:"from_command"`
+type JobVars struct {
+	FromCommand []CommandVarSpec `yaml:"from_command"`
 }
 
 type CommandVarSpec map[string]string

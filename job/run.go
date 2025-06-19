@@ -1,6 +1,7 @@
 package job
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -10,6 +11,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 type RunJob struct {
@@ -36,7 +38,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	// make vars api
 
 	vars := NewVars(job.VarPrefix)
-	vars.SetGlobal("JOBID", job.JobId)
+	vars.Global.SetVar("JOBID", job.JobId)
 
 	// build run spe
 	runSpec := &RunSpec{
@@ -47,9 +49,9 @@ func Run(job *JobSpec) (*RunSpec, error) {
 		Vars:    vars,
 	}
 
-	vars.SetGlobal("RUNID", runid_str)
-	vars.SetGlobal("RUNDIR", rundir)
-	vars.SetGlobal("WORKSPACE", workdir)
+	vars.Global.SetVar("RUNID", runid_str)
+	vars.Global.SetVar("RUNDIR", rundir)
+	vars.Global.SetVar("WORKSPACE", workdir)
 
 	if len(job.Steps) == 0 {
 		return nil, fmt.Errorf("Job has no steps: jid:%s", job.JobId)
@@ -141,6 +143,11 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 	}
 
+	err = captureVariables(job.Vars, runSpec)
+	if err != nil {
+		return nil, err
+	}
+
 	// purge runs
 	if job.Keep > 0 {
 		err = purgeRuns(rundir_base, job.Keep)
@@ -150,6 +157,40 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	}
 
 	return runSpec, nil
+}
+
+func captureVariables(vars_spec []*JobVars, runSpec *RunSpec) error {
+
+	// capture variables
+	for _, jv := range vars_spec {
+
+		// process from command variables
+		for _, command_vars := range jv.FromCommand {
+
+			for var_name, command := range command_vars {
+
+				cmdline := []string{
+					"sh", "-x", "-c", command,
+				}
+				c := exec.Command(cmdline[0], cmdline[1:]...)
+				buf := bytes.NewBuffer(nil)
+				c.Stderr = os.Stderr
+				c.Stdout = buf
+				c.Dir = runSpec.WorkDir
+				err := c.Run()
+				if err != nil {
+					slog.Warn("From_command error", "variable", var_name, "command", command, "error", err)
+					continue
+				}
+				val := strings.Trim(buf.String(), " \n\t")
+
+				slog.Debug("command variable result", "variable", var_name, "value", val)
+
+			}
+		}
+
+	}
+	return nil
 }
 
 // return the highest integer directory in the jobs rundir
