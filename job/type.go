@@ -101,8 +101,9 @@ func (me *RunSpec) GetLogFile() string {
 }
 
 func (me *RunSpec) Logf(s string, args ...any) {
-	fmt.Fprintf(me.LogFile, s, args...)
-	msg := fmt.Sprintf("#### "+s+"\n", args...)
+	prefix := "#### "
+	fmt.Fprintf(me.LogFile, prefix+s+"\n", args...)
+	msg := fmt.Sprintf(prefix+s, args...)
 	slog.Debug("Logf", "msg", msg)
 }
 
