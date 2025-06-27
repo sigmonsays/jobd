@@ -88,6 +88,8 @@ type RunSpec struct {
 	WorkDir string
 	LogFile io.Writer `json:"-"`
 
+	EnvFile string
+
 	StepResults []*StepResult
 
 	Vars *Vars

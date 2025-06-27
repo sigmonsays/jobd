@@ -1,7 +1,10 @@
 package job
 
 import (
+	"bufio"
 	"log/slog"
+	"os"
+	"strings"
 )
 
 type ShellResult struct {
@@ -23,6 +26,25 @@ func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*Shel
 	ex.Timeout = sh.Timeout
 	ex.Dir = sh.WorkingDir
 	ex.Env = sh.Env
+
+	// pass through envfile
+	f, err := os.Open(runSpec.EnvFile)
+	if err != nil {
+		return ret, err
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimRight(scanner.Text(), "\r\n")
+		idx := strings.Index(line, "=")
+		if idx == -1 {
+			continue
+		}
+		k := line[:idx]
+		v := line[idx+1:]
+		slog.Debug("Envfile setenv", "k", k, "v", v)
+		ex.SetEnv(k, v)
+	}
 
 	// pass through some global variables to shell env variables
 	for k, v := range runSpec.Vars.Global.Vars {

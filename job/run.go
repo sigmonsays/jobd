@@ -34,9 +34,9 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	workdir := filepath.Join(rundir, "workspace")
 	os.MkdirAll(rundir, 0700)
 	os.MkdirAll(workdir, 0700)
+	envfile := filepath.Join(rundir, "shell.env")
 
 	// make vars api
-
 	vars := NewVars(job.VarPrefix)
 	vars.Global.SetVar("JOBID", job.JobId)
 
@@ -47,9 +47,9 @@ func Run(job *JobSpec) (*RunSpec, error) {
 		RunDir:  rundir,
 		WorkDir: workdir,
 		Vars:    vars,
+		EnvFile: envfile,
 	}
 
-	envfile := filepath.Join(runSpec.RunDir, "shell.env")
 	envbuf := bytes.NewBuffer(nil)
 	fmt.Fprintf(envbuf, "#!/usr/bin/env bash\n")
 	fmt.Fprintf(envbuf, "# environment variable for shell commands\n")
