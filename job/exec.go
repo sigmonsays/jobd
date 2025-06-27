@@ -125,19 +125,9 @@ func (me *Exec) Run() error {
 	dur := time.Since(now)
 	me.ExecuteTimeMs = int64(dur.Nanoseconds() / 1000000)
 
-	now2 := time.Now()
-	deadline, deadline_set := ctx.Deadline()
-	if deadline_set && deadline.After(now2) {
-		me.TimedOut = true
-		slog.Debug("exec run: context deadline exceeded")
-	}
-
 	if ctx.Err() == context.DeadlineExceeded {
 		me.TimedOut = true
-		slog.Debug("exec run: context deadline exceeded")
-	}
-
-	if err != nil {
+	} else if err != nil {
 		if c.ProcessState != nil {
 			me.ExitCode = c.ProcessState.ExitCode()
 		}

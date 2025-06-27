@@ -40,7 +40,13 @@ func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*Shel
 		return ret, err
 	}
 
-	slog.Debug("exec returned", "jid", runSpec.JobId, "rid", runSpec.RunId, "step", step, "exitcode", ex.ExitCode)
+	slog.Debug("exec returned",
+		"jid", runSpec.JobId,
+		"rid", runSpec.RunId,
+		"step", step,
+		"exitcode", ex.ExitCode,
+		"timedout", ex.TimedOut,
+	)
 
 	err = captureVariables(job.Vars, runSpec, runSpec.Vars.GetStep(step))
 	if err != nil {
