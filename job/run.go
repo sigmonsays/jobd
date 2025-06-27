@@ -50,6 +50,10 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	}
 
 	envfile := filepath.Join(runSpec.RunDir, "shell.env")
+	envbuf := bytes.NewBuffer(nil)
+	fmt.Fprintf(envbuf, "#!/usr/bin/env bash\n")
+	fmt.Fprintf(envbuf, "# environment variable for shell commands\n")
+	os.WriteFile(envfile, envbuf.Bytes(), 0644)
 
 	vars.Global.SetVar("RUNID", runid_str)
 	vars.Global.SetVar("RUNDIR", rundir)
