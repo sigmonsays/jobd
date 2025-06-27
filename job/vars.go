@@ -10,6 +10,10 @@ func NewVars(prefix string) *Vars {
 
 type Var string
 
+func (me Var) String() string {
+	return string(me)
+}
+
 // variable management for jobs and steps
 // top level vars struct
 type Vars struct {

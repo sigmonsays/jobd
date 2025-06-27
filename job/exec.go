@@ -2,6 +2,7 @@ package job
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -70,6 +71,11 @@ func (me *Exec) Init() error {
 	os.WriteFile(scriptfile, []byte(prepend+me.Script), 0755)
 
 	return nil
+}
+
+func (me *Exec) SetEnv(k, v string) {
+	kv := fmt.Sprintf("%s=%s", k, v)
+	me.Env = append(me.Env, kv)
 }
 
 func (me *Exec) buildCommand(ctx context.Context) (*exec.Cmd, func(), context.Context) {

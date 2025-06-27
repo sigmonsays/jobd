@@ -49,9 +49,12 @@ func Run(job *JobSpec) (*RunSpec, error) {
 		Vars:    vars,
 	}
 
+	envfile := filepath.Join(runSpec.RunDir, "shell.env")
+
 	vars.Global.SetVar("RUNID", runid_str)
 	vars.Global.SetVar("RUNDIR", rundir)
 	vars.Global.SetVar("WORKSPACE", workdir)
+	vars.Global.SetVar("ENV", envfile)
 
 	slog.Debug("run job", "rundir", rundir, "workdir", workdir)
 

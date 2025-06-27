@@ -24,6 +24,11 @@ func RunShell(runSpec *RunSpec, step string, job *JobSpec, sh *ShellSpec) (*Shel
 	ex.Dir = sh.WorkingDir
 	ex.Env = sh.Env
 
+	// pass through some global variables to shell env variables
+	for k, v := range runSpec.Vars.Global.Vars {
+		ex.SetEnv(k, v.String())
+	}
+
 	ex.ScriptDir = job.Directory
 	ex.LogDir = runSpec.RunDir
 	err = ex.Init()
