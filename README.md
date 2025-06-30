@@ -61,6 +61,7 @@ Full job spec
 - `id` - string - optional step id
 - `shell` - string - shell spec definition
 - `vars` - array - variables to capture
+- `vars.[].from_command.KEY` - string - variables to capture by running command and store in KEY
 
 ```
 jobs:
