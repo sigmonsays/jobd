@@ -2,6 +2,27 @@
 
 a simple cicd daemon for executing jobs on a schedule
 
+# configuration
+
+default configuration
+
+```
+datadir: /srv/jobd
+shell_defaults:
+  workingdir: ""
+  env: []
+  immediateexit: false
+  timeout: 3600
+```
+
+shell_defaults
+
+- `workingdir`
+- `env`
+- `immediatexit` like adding `set -e` to scripts
+- `timeout`
+
+
 # Job Spec
 
 a job or a JobSpec defines how to run a job, which is a set of steps
@@ -35,7 +56,8 @@ Full job spec
 - `schedule` - string - cron schedule, see github.com/robfig/cron for expressions
 - steps - array - array of job steps
 
-job step spec
+# job step spec
+
 - `id` - string - optional step id
 - `shell` - string - shell spec definition
 - `vars` - array - variables to capture
@@ -69,3 +91,12 @@ jobs:
 
 
 ```
+
+# job shell spec
+
+
+- `script` - string - script
+- `workingdir`
+- `env`
+- `immediatexit`
+- `timeout`
