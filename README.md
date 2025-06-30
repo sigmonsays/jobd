@@ -26,10 +26,24 @@ jobs:
 
 Full job spec
 
+- `disabled` bool - true if job is disabled. default false.
+- `immediate` bool - true if job runs immediately at startup, default false.
+- `stackable` bool - true if job can run multiple instances, default false.
+- `keep` int - number of previous runs to keep, 0 means keep all. default 0.
+- `directory` - string - the starting directory of the job.
+   default is {datadir}/jobs/{jobid}/run/{runid}/workspace
+- `schedule` - string - cron schedule, see github.com/robfig/cron for expressions
+- steps - array - array of job steps
+
+job step spec
+- `id` - string - optional step id
+- `shell` - string - shell spec definition
+- `vars` - array - variables to capture
+
 ```
 jobs:
 - jobid: someid
-  disable: true
+  disabled: true
   immediate: true
   stackable: true
   keep: 3
