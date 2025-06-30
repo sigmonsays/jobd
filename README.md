@@ -108,8 +108,8 @@ A special `$ENV` variable is set to carry environment variable between steps
 
 To pass a variable between steps
 
-   echo FOO=BAR >> $ENV
+    echo FOO=BAR >> $ENV
 
-then to access the variable in a step
+to access the variable in a different step
 
-   echo $FOO
+    echo $FOO
