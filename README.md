@@ -23,7 +23,7 @@ shell_defaults
 - `timeout`
 
 
-# Job Spec
+# Job spec
 
 a job or a JobSpec defines how to run a job, which is a set of steps
 
@@ -56,7 +56,7 @@ Full job spec
 - `schedule` - string - cron schedule, see github.com/robfig/cron for expressions
 - steps - array - array of job steps
 
-# job step spec
+# step spec
 
 - `id` - string - optional step id
 - `shell` - string - shell spec definition
@@ -92,7 +92,7 @@ jobs:
 
 ```
 
-# job shell spec
+# shell spec
 
 
 - `script` - string - script
@@ -100,3 +100,16 @@ jobs:
 - `env`
 - `immediatexit`
 - `timeout`
+
+
+# variables
+
+A special `$ENV` variable is set to carry environment variable between steps
+
+To pass a variable between steps
+
+   echo FOO=BAR >> $ENV
+
+then to access the variable in a step
+
+   echo $FOO
