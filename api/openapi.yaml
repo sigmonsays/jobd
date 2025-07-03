@@ -186,14 +186,19 @@ components:
       # required:
       #   - name
       properties:
-        name:
-          description: job name
+        jid:
+          description: job id
           type: string
           maxLength: 63
           minLength: 3
-        script:
-          type: string
-          description: job script
+        nsteps:
+          type: integer
+          format: int32
+          description: number of steps
+        exitcode:
+          type: integer
+          format: int32
+          description: last run exit code
 
 
     # ---- ListJob -------

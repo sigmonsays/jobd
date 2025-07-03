@@ -27,6 +27,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/sigmonsays/git-watch v0.0.7 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect

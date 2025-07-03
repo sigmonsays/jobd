@@ -248,22 +248,29 @@ func (s *Job) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *Job) encodeFields(e *jx.Encoder) {
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
+		if s.Jid.Set {
+			e.FieldStart("jid")
+			s.Jid.Encode(e)
 		}
 	}
 	{
-		if s.Script.Set {
-			e.FieldStart("script")
-			s.Script.Encode(e)
+		if s.Nsteps.Set {
+			e.FieldStart("nsteps")
+			s.Nsteps.Encode(e)
+		}
+	}
+	{
+		if s.Exitcode.Set {
+			e.FieldStart("exitcode")
+			s.Exitcode.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfJob = [2]string{
-	0: "name",
-	1: "script",
+var jsonFieldsNameOfJob = [3]string{
+	0: "jid",
+	1: "nsteps",
+	2: "exitcode",
 }
 
 // Decode decodes Job from json.
@@ -274,25 +281,35 @@ func (s *Job) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "name":
+		case "jid":
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				s.Jid.Reset()
+				if err := s.Jid.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
+				return errors.Wrap(err, "decode field \"jid\"")
 			}
-		case "script":
+		case "nsteps":
 			if err := func() error {
-				s.Script.Reset()
-				if err := s.Script.Decode(d); err != nil {
+				s.Nsteps.Reset()
+				if err := s.Nsteps.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"script\"")
+				return errors.Wrap(err, "decode field \"nsteps\"")
+			}
+		case "exitcode":
+			if err := func() error {
+				s.Exitcode.Reset()
+				if err := s.Exitcode.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"exitcode\"")
 			}
 		default:
 			return d.Skip()
@@ -464,6 +481,41 @@ func (s *ListJobResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ListJobResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes int32 as json.
+func (o OptInt32) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Int32(int32(o.Value))
+}
+
+// Decode decodes int32 from json.
+func (o *OptInt32) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptInt32 to nil")
+	}
+	o.Set = true
+	v, err := d.Int32()
+	if err != nil {
+		return err
+	}
+	o.Value = int32(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptInt32) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptInt32) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

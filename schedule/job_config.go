@@ -18,6 +18,15 @@ type JobConfig struct {
 	jobs map[string]*job.JobSpec
 }
 
+func (me *JobConfig) ListJobs() []string {
+	me.mx.Lock()
+	defer me.mx.Unlock()
+	ret := make([]string, 0)
+	for jid, _ := range me.jobs {
+		ret = append(ret, jid)
+	}
+	return ret
+}
 func (me *JobConfig) SetConfig(jid string, cfg *job.JobSpec) {
 	me.mx.Lock()
 	defer me.mx.Unlock()

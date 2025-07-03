@@ -59,30 +59,42 @@ func (s *ApiErrorGenericError) SetMessage(val string) {
 
 // Ref: #/components/schemas/Job
 type Job struct {
-	// Job name.
-	Name OptString `json:"name"`
-	// Job script.
-	Script OptString `json:"script"`
+	// Job id.
+	Jid OptString `json:"jid"`
+	// Number of steps.
+	Nsteps OptInt32 `json:"nsteps"`
+	// Last run exit code.
+	Exitcode OptInt32 `json:"exitcode"`
 }
 
-// GetName returns the value of Name.
-func (s *Job) GetName() OptString {
-	return s.Name
+// GetJid returns the value of Jid.
+func (s *Job) GetJid() OptString {
+	return s.Jid
 }
 
-// GetScript returns the value of Script.
-func (s *Job) GetScript() OptString {
-	return s.Script
+// GetNsteps returns the value of Nsteps.
+func (s *Job) GetNsteps() OptInt32 {
+	return s.Nsteps
 }
 
-// SetName sets the value of Name.
-func (s *Job) SetName(val OptString) {
-	s.Name = val
+// GetExitcode returns the value of Exitcode.
+func (s *Job) GetExitcode() OptInt32 {
+	return s.Exitcode
 }
 
-// SetScript sets the value of Script.
-func (s *Job) SetScript(val OptString) {
-	s.Script = val
+// SetJid sets the value of Jid.
+func (s *Job) SetJid(val OptString) {
+	s.Jid = val
+}
+
+// SetNsteps sets the value of Nsteps.
+func (s *Job) SetNsteps(val OptInt32) {
+	s.Nsteps = val
+}
+
+// SetExitcode sets the value of Exitcode.
+func (s *Job) SetExitcode(val OptInt32) {
+	s.Exitcode = val
 }
 
 type ListJobBadRequest ApiErrorGenericError
@@ -110,6 +122,52 @@ func (s *ListJobResponse) SetJobs(val []Job) {
 }
 
 func (*ListJobResponse) listJobRes() {}
+
+// NewOptInt32 returns new OptInt32 with value set to v.
+func NewOptInt32(v int32) OptInt32 {
+	return OptInt32{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt32 is optional int32.
+type OptInt32 struct {
+	Value int32
+	Set   bool
+}
+
+// IsSet returns true if OptInt32 was set.
+func (o OptInt32) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt32) Reset() {
+	var v int32
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt32) SetTo(v int32) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt32) Get() (v int32, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt32) Or(d int32) int32 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
 
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
