@@ -3,7 +3,6 @@ package polling
 import (
 	"log/slog"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/sigmonsays/jobd/core"
@@ -36,7 +35,16 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 		}
 	}
 
+	// get a handle on the jobs scheduler context
+	shedJob, err := appCtx.Scheduler.FindJobByName(j.JobId)
+	if err != nil {
+		return err
+	}
+
+	quit := shedJob.JobCtx.Done()
+
 	// start watching
+	// git is the only backend
 	gitWatch := git_watch.NewGitWatch(gitDir, j.Upstream.Git.Branch)
 	gitWatch.Interval = pollInt
 	changes := make(chan *GitUpstreamNotify, 5)
@@ -55,60 +63,28 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	defer gitWatch.Stop()
 
 	// todo: Wire up job schedule stopping (JobCtx) here
+Dance:
 	for {
 		select {
 		case change := <-changes:
+			go RepoChange(appCtx, j, gitDir, change)
 
-			PullRepo(j, gitDir)
-
-			// schedule job
-			// todo: Pass change event into job somehow
-			slog.Info("change detected, executing job", "jid", j.JobId, "change", change)
-			go schedule.RunJobSpec(appCtx.Executor, j)
+		case <-quit:
+			break Dance
 		}
 	}
-
-	return nil
-}
-func CloneRepo(j *job.JobSpec, gitDir string) error {
-
-	cmdline := []string{
-		"git",
-		"clone",
-		j.Upstream.Git.Remote,
-		gitDir,
-	}
-	slog.Info("git clone", "cmdline", cmdline)
-
-	cmd := exec.Command(cmdline[0], cmdline[1:]...)
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
-func PullRepo(j *job.JobSpec, gitDir string) error {
+func RepoChange(appCtx *core.Context, j *job.JobSpec, gitDir string, change *GitUpstreamNotify) error {
 
-	cmdline := []string{
-		"git",
-		"pull",
-	}
-	slog.Info("git pull", "cmdline", cmdline)
+	// pull git repo
+	PullRepo(j, gitDir)
 
-	cmd := exec.Command(cmdline[0], cmdline[1:]...)
-	cmd.Dir = gitDir
+	// run job
+	// todo: Pass change event into job somehow
+	slog.Info("change detected, executing job", "jid", j.JobId, "change", change)
+	schedule.RunJobSpec(appCtx.Executor, j)
 
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		return err
-	}
 	return nil
 }
