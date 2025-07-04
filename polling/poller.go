@@ -24,7 +24,7 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	pollInt := 30
 
 	// clone repo first if needed
-	gitDir := filepath.Join(j.Directory, "upstream/git/default")
+	gitDir := filepath.Join(j.Directory, "upstream")
 	baseDir := filepath.Base(gitDir)
 	os.MkdirAll(baseDir, 0766)
 	_, err := os.Stat(gitDir)
