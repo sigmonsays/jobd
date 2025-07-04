@@ -27,11 +27,10 @@ shell_defaults
 
 a job or a JobSpec defines how to run a job, which is a set of steps
 
-jobs are define under the `jobs:` section of the configuration file. Each entry
-is an array.
+jobs are define under the `jobs:` array of the configuration file. Each entry
+is an object.
 
 a Job definition looks like this
-
 
 Minimal job spec:
 
@@ -54,7 +53,7 @@ Full job spec
 - `directory` - string - the starting directory of the job.
    default is {datadir}/jobs/{jobid}/run/{runid}/workspace
 - `schedule` - string - cron schedule, see github.com/robfig/cron for expressions
-- steps - array - array of job steps
+- `steps` - array - array of job steps
 
 # step spec
 
