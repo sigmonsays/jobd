@@ -40,6 +40,12 @@ type Invoker interface {
 	//
 	// GET /api/ping
 	Ping(ctx context.Context, params PingParams) (PingRes, error)
+	// RunJob invokes RunJob operation.
+	//
+	// Run a job.
+	//
+	// POST /api/job/run
+	RunJob(ctx context.Context, request *RunJobRequest) (RunJobRes, error)
 }
 
 // Client implements OAS client.
@@ -243,6 +249,81 @@ func (c *Client) sendPing(ctx context.Context, params PingParams) (res PingRes, 
 
 	stage = "DecodeResponse"
 	result, err := decodePingResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// RunJob invokes RunJob operation.
+//
+// Run a job.
+//
+// POST /api/job/run
+func (c *Client) RunJob(ctx context.Context, request *RunJobRequest) (RunJobRes, error) {
+	res, err := c.sendRunJob(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendRunJob(ctx context.Context, request *RunJobRequest) (res RunJobRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("RunJob"),
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/api/job/run"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, RunJobOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/api/job/run"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeRunJobRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeRunJobResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

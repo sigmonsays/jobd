@@ -30,3 +30,12 @@ func (UnimplementedHandler) ListJob(ctx context.Context) (r ListJobRes, _ error)
 func (UnimplementedHandler) Ping(ctx context.Context, params PingParams) (r PingRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
+
+// RunJob implements RunJob operation.
+//
+// Run a job.
+//
+// POST /api/job/run
+func (UnimplementedHandler) RunJob(ctx context.Context, req *RunJobRequest) (r RunJobRes, _ error) {
+	return r, ht.ErrNotImplemented
+}

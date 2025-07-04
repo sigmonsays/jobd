@@ -13,8 +13,10 @@ import (
 	"github.com/sigmonsays/jobd/api"
 	"github.com/sigmonsays/jobd/app"
 	"github.com/sigmonsays/jobd/config"
+	"github.com/sigmonsays/jobd/core"
 	"github.com/sigmonsays/jobd/job"
 	"github.com/sigmonsays/jobd/log"
+	"github.com/sigmonsays/jobd/polling"
 	"github.com/sigmonsays/jobd/schedule"
 	"github.com/sigmonsays/jobd/ui"
 )
@@ -87,7 +89,7 @@ func run(cfg *config.AppConfig, opts *Options) error {
 	}
 
 	// build api
-	ctx := &app.Context{
+	ctx := &core.Context{
 		AppConfig: cfg,
 	}
 	app := &app.Api{
@@ -177,12 +179,13 @@ func run(cfg *config.AppConfig, opts *Options) error {
 		}
 		sched.AddJob(j)
 
+		// start any polling if git remote is set
+		if job_spec.Upstream.Git.Remote != "" && job_spec.Upstream.Git.Branch != "" {
+			go polling.JobPoller(job_spec, app.Context)
+		}
+
 		if job_spec.Immediate {
-			go func() {
-				opts := schedule.DefaultExecuteOptions()
-				opts.Stackable = job_spec.Stackable
-				exec.Execute(j.Id, rj, opts)
-			}()
+			go schedule.RunJobSpec(exec, job_spec)
 		}
 	}
 
@@ -198,11 +201,23 @@ func run(cfg *config.AppConfig, opts *Options) error {
 
 // set defaults on the jobs
 func SetJobDefaults(cfg *config.AppConfig) error {
-	for _, job := range cfg.Jobs {
-		if job.Directory == "" {
-			job.Directory = filepath.Join(cfg.DataDir, "jobs", job.JobId)
+
+	for _, j := range cfg.Jobs {
+		if j.Upstream == nil {
+			j.Upstream = &job.UpstreamSpec{}
 		}
-		for idx, step := range job.Steps {
+		if j.Upstream.Git == nil {
+			j.Upstream.Git = &job.GitSpec{}
+		}
+
+		if j.Keep == 0 && cfg.Defaults.Keep > 0 {
+			j.Keep = cfg.Defaults.Keep
+		}
+
+		if j.Directory == "" {
+			j.Directory = filepath.Join(cfg.DataDir, "jobs", j.JobId)
+		}
+		for idx, step := range j.Steps {
 			step_num := idx + 1
 			if step.Shell != nil {
 				if step.Shell.Timeout == 0 {

@@ -1,16 +1,7 @@
 package app
 
-import (
-	"github.com/sigmonsays/jobd/config"
-	"github.com/sigmonsays/jobd/schedule"
-)
+import "github.com/sigmonsays/jobd/core"
 
 type Api struct {
-	*Context
-}
-type Context struct {
-	*config.AppConfig
-	JobConfig *schedule.JobConfig
-	Scheduler *schedule.Scheduler
-	Executor  *schedule.Executor
+	*core.Context
 }

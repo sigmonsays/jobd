@@ -8,3 +8,7 @@ type ListJobRes interface {
 type PingRes interface {
 	pingRes()
 }
+
+type RunJobRes interface {
+	runJobRes()
+}
