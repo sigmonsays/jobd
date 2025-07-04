@@ -10,8 +10,13 @@ import (
 	"github.com/sigmonsays/jobd/job"
 )
 
+// populate git env
+// see https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables
 func populateEnv(e []string, j *job.JobSpec) []string {
 	cfg := j.Upstream.Git
+
+	e = append(e, "GIT_CONFIG_NOSYSTEM=1")
+	e = append(e, "GIT_PAGER=cat")
 
 	if cfg.IdentityFile != "" {
 		e = env_ssh_command(j, e, cfg.IdentityFile)
