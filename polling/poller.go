@@ -59,6 +59,8 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 		select {
 		case change := <-changes:
 
+			PullRepo(j, gitDir)
+
 			// schedule job
 			// todo: Pass change event into job somehow
 			slog.Info("change detected, executing job", "jid", j.JobId, "change", change)
@@ -79,6 +81,27 @@ func CloneRepo(j *job.JobSpec, gitDir string) error {
 	slog.Info("git clone", "cmdline", cmdline)
 
 	cmd := exec.Command(cmdline[0], cmdline[1:]...)
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func PullRepo(j *job.JobSpec, gitDir string) error {
+
+	cmdline := []string{
+		"git",
+		"pull",
+	}
+	slog.Info("git pull", "cmdline", cmdline)
+
+	cmd := exec.Command(cmdline[0], cmdline[1:]...)
+	cmd.Dir = gitDir
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
