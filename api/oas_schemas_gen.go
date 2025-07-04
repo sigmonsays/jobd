@@ -30,6 +30,7 @@ func (s *ApiErrorAuthError) SetMessage(val string) {
 
 func (*ApiErrorAuthError) listJobRes() {}
 func (*ApiErrorAuthError) pingRes()    {}
+func (*ApiErrorAuthError) runJobRes()  {}
 
 // Ref: #/components/schemas/ApiErrorGenericError
 type ApiErrorGenericError struct {
@@ -240,3 +241,49 @@ func (s *PingResponse) SetMessage(val OptString) {
 }
 
 func (*PingResponse) pingRes() {}
+
+type RunJobBadRequest ApiErrorGenericError
+
+func (*RunJobBadRequest) runJobRes() {}
+
+type RunJobInternalServerError ApiErrorGenericError
+
+func (*RunJobInternalServerError) runJobRes() {}
+
+// Ref: #/components/schemas/RunJobRequest
+type RunJobRequest struct {
+	// Job id.
+	Jobid OptString `json:"jobid"`
+}
+
+// GetJobid returns the value of Jobid.
+func (s *RunJobRequest) GetJobid() OptString {
+	return s.Jobid
+}
+
+// SetJobid sets the value of Jobid.
+func (s *RunJobRequest) SetJobid(val OptString) {
+	s.Jobid = val
+}
+
+// Ref: #/components/schemas/RunJobResponse
+type RunJobResponse struct {
+	// Job status.
+	Message OptString `json:"message"`
+}
+
+// GetMessage returns the value of Message.
+func (s *RunJobResponse) GetMessage() OptString {
+	return s.Message
+}
+
+// SetMessage sets the value of Message.
+func (s *RunJobResponse) SetMessage(val OptString) {
+	s.Message = val
+}
+
+func (*RunJobResponse) runJobRes() {}
+
+type RunJobUnauthorized ApiErrorGenericError
+
+func (*RunJobUnauthorized) runJobRes() {}

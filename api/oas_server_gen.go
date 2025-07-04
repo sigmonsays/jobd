@@ -20,6 +20,12 @@ type Handler interface {
 	//
 	// GET /api/ping
 	Ping(ctx context.Context, params PingParams) (PingRes, error)
+	// RunJob implements RunJob operation.
+	//
+	// Run a job.
+	//
+	// POST /api/job/run
+	RunJob(ctx context.Context, req *RunJobRequest) (RunJobRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and
