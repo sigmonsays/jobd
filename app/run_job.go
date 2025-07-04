@@ -16,20 +16,26 @@ func (me *Api) RunJob(context context.Context, req *api.RunJobRequest) (api.RunJ
 	jcfg, err := me.JobConfig.GetConfig(req.Jobid.Value)
 	if err != nil {
 		slog.Debug("GetConfig error", "jid", req.Jobid.Value, "err", err)
-		ret.Message.SetTo(err.Error())
-		return ret, nil
+		return &api.RunJobInternalServerError{
+			Code:    "get-config:not-found",
+			Message: err.Error(),
+		}, nil
 	}
 
 	if jcfg.Disabled {
-		ret.Message.SetTo("Job disabled")
-		return ret, nil
+		return &api.RunJobInternalServerError{
+			Code:    "job-disabled",
+			Message: "job is disabled",
+		}, nil
 	}
 
 	_, err = me.Scheduler.FindJobByName(req.Jobid.Value)
 	if err != nil {
 		slog.Debug("GetConfig error", "jid", req.Jobid.Value, "err", err)
-		ret.Message.SetTo(err.Error())
-		return ret, nil
+		return &api.RunJobInternalServerError{
+			Code:    "scheduler:job-not-found",
+			Message: err.Error(),
+		}, nil
 	}
 
 	opts := schedule.DefaultExecuteOptions()
