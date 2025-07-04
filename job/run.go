@@ -40,7 +40,7 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	vars := NewVars(job.VarPrefix)
 	vars.Global.SetVar("JOBID", job.JobId)
 
-	// build run spe
+	// build run spec
 	runSpec := &RunSpec{
 		JobId:   job.JobId,
 		RunId:   runid,
