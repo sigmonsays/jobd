@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/sigmonsays/jobd/api"
-	"github.com/sigmonsays/jobd/job"
 	"github.com/sigmonsays/jobd/schedule"
 )
 
@@ -38,20 +37,7 @@ func (me *Api) RunJob(context context.Context, req *api.RunJobRequest) (api.RunJ
 		}, nil
 	}
 
-	opts := schedule.DefaultExecuteOptions()
-	opts.Stackable = true // always run
-
-	runnable := &job.RunJob{
-		JobSpec: jcfg,
-	}
-
-	go func() {
-		err := me.Executor.Execute(req.Jobid.Value, runnable, opts)
-		if err != nil {
-			slog.Debug("Execute error", "jid", req.Jobid.Value, "err", err)
-		}
-
-	}()
+	go schedule.RunJobSpec(me.Executor, jcfg)
 
 	return ret, nil
 }

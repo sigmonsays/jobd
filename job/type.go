@@ -49,6 +49,20 @@ type JobSpec struct {
 	// variables to capture
 	VarPrefix string
 	Vars      []*JobVars
+
+	// Upstream
+	Upstream *UpstreamSpec
+}
+
+type UpstreamSpec struct {
+	Git *GitSpec
+}
+
+type GitSpec struct {
+	Remote string
+
+	// todo: Support more than one branch, tag, globs, etc
+	Branch string
 }
 
 type JobStep struct {

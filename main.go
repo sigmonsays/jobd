@@ -13,6 +13,7 @@ import (
 	"github.com/sigmonsays/jobd/api"
 	"github.com/sigmonsays/jobd/app"
 	"github.com/sigmonsays/jobd/config"
+	"github.com/sigmonsays/jobd/core"
 	"github.com/sigmonsays/jobd/job"
 	"github.com/sigmonsays/jobd/log"
 	"github.com/sigmonsays/jobd/schedule"
@@ -87,7 +88,7 @@ func run(cfg *config.AppConfig, opts *Options) error {
 	}
 
 	// build api
-	ctx := &app.Context{
+	ctx := &core.Context{
 		AppConfig: cfg,
 	}
 	app := &app.Api{

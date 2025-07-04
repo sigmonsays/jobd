@@ -1,7 +1,7 @@
 package ui
 
-import "github.com/sigmonsays/jobd/app"
+import "github.com/sigmonsays/jobd/core"
 
 type Ui struct {
-	Context *app.Context
+	Context *core.Context
 }
