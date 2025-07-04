@@ -97,13 +97,13 @@ func (me *Scheduler) AddJob(j *Job) error {
 	me.Jobs = append(me.Jobs, j)
 	cj := &CronJob{j}
 	eid, err := me.c.AddJob(j.Schedule, cj)
+	if err != nil {
+		return err
+	}
 	slog.Info("Scheduled job", "jid", j.Id, "eid", eid)
 
 	me.saveJob(j, int(eid))
 
-	if err != nil {
-		return err
-	}
 	return nil
 }
 

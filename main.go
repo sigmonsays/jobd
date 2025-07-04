@@ -16,6 +16,7 @@ import (
 	"github.com/sigmonsays/jobd/core"
 	"github.com/sigmonsays/jobd/job"
 	"github.com/sigmonsays/jobd/log"
+	"github.com/sigmonsays/jobd/polling"
 	"github.com/sigmonsays/jobd/schedule"
 	"github.com/sigmonsays/jobd/ui"
 )
@@ -178,6 +179,11 @@ func run(cfg *config.AppConfig, opts *Options) error {
 		}
 		sched.AddJob(j)
 
+		// start any polling if git remote is set
+		if job_spec.Upstream.Git.Remote != "" {
+			go polling.JobPoller(job_spec, app.Context)
+		}
+
 		if job_spec.Immediate {
 			go func() {
 				opts := schedule.DefaultExecuteOptions()
@@ -199,16 +205,23 @@ func run(cfg *config.AppConfig, opts *Options) error {
 
 // set defaults on the jobs
 func SetJobDefaults(cfg *config.AppConfig) error {
-	for _, job := range cfg.Jobs {
 
-		if job.Keep == 0 && cfg.Defaults.Keep > 0 {
-			job.Keep = cfg.Defaults.Keep
+	for _, j := range cfg.Jobs {
+		if j.Upstream == nil {
+			j.Upstream = &job.UpstreamSpec{}
+		}
+		if j.Upstream.Git == nil {
+			j.Upstream.Git = &job.GitSpec{}
 		}
 
-		if job.Directory == "" {
-			job.Directory = filepath.Join(cfg.DataDir, "jobs", job.JobId)
+		if j.Keep == 0 && cfg.Defaults.Keep > 0 {
+			j.Keep = cfg.Defaults.Keep
 		}
-		for idx, step := range job.Steps {
+
+		if j.Directory == "" {
+			j.Directory = filepath.Join(cfg.DataDir, "jobs", j.JobId)
+		}
+		for idx, step := range j.Steps {
 			step_num := idx + 1
 			if step.Shell != nil {
 				if step.Shell.Timeout == 0 {
