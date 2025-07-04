@@ -107,6 +107,20 @@ func (me *Scheduler) AddJob(j *Job) error {
 	return nil
 }
 
+func (me *Scheduler) StopJob(jid string) error {
+	job, err := me.FindJobByName(jid)
+	if err != nil {
+		return err
+	}
+
+	me.c.Remove(cron.EntryID(job.Eid))
+
+	// cancel context
+	job.CancelFunc()
+
+	return nil
+}
+
 func (me *Scheduler) saveJob(j *Job, eid int) error {
 	me.mx.Lock()
 	defer me.mx.Unlock()
@@ -118,6 +132,13 @@ func (me *Scheduler) saveJob(j *Job, eid int) error {
 
 	// save by name
 	me.names[j.Id] = j
+
+	// create a cancel context per job
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	j.JobCtx = ctx
+	j.CancelFunc = cancel
+
 	return nil
 }
 
@@ -136,6 +157,9 @@ type Job struct {
 
 	Started time.Time
 	Stopped time.Time
+
+	JobCtx     context.Context
+	CancelFunc func()
 }
 
 func (me *Job) SetEid(eid int) {
