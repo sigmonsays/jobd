@@ -59,6 +59,10 @@ type UpstreamSpec struct {
 }
 
 type GitSpec struct {
+
+	// ssh key
+	IdentityFile string
+
 	Remote string
 
 	// todo: Support more than one branch, tag, globs, etc

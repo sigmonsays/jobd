@@ -40,6 +40,8 @@ github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
 github.com/segmentio/asm v1.2.0 h1:9BQrFxC+YOHJlTlHGkTrFWf59nbL3XnCoFLTwDCI7ys=
 github.com/segmentio/asm v1.2.0/go.mod h1:BqMnlJP91P8d+4ibuonYZw9mfnzI9HfxselHZr5aAcs=
+github.com/shurcooL/go v0.0.0-20230706063926-5fe729b41b3a h1:ZHfoO7ZJhws9NU1kzZhStUnnVQiPtDe1PzpUnc6HirU=
+github.com/shurcooL/go v0.0.0-20230706063926-5fe729b41b3a/go.mod h1:DNrlr0AR9NsHD/aoc2pPeu4uSBZ/71yCHkR42yrzW3M=
 github.com/sigmonsays/git-watch v0.0.7 h1:GhXfbpwvLwDO5mrPABfO4ja5uVNm3pPfV7GY8hiVMc0=
 github.com/sigmonsays/git-watch v0.0.7/go.mod h1:5EkNM20NpChC5t3wkodfWDAe7EhLm08YrGOkMPcsCbI=
 github.com/sigmonsays/go-logging v0.0.0-20220128052735-680ed4f96095 h1:xCly5jE+yNrptrLVDO8XwLiB8fPr8EnjF90EUP/5nEc=
