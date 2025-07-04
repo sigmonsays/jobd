@@ -62,6 +62,14 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	gitWatch.Start()
 	defer gitWatch.Stop()
 
+	// send a change event if the repo was just cloned
+	if setupDir {
+		changes <- &GitUpstreamNotify{
+			LocalHash:  "",
+			RemoteHash: "",
+		}
+	}
+
 	// todo: Wire up job schedule stopping (JobCtx) here
 Dance:
 	for {

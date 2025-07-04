@@ -8,6 +8,9 @@ require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
 	github.com/ogen-go/ogen v1.14.0
+	github.com/robfig/cron/v3 v3.0.0
+	github.com/shurcooL/go v0.0.0-20230706063926-5fe729b41b3a
+	github.com/sigmonsays/git-watch v0.0.7
 	github.com/sigmonsays/go-logging v0.0.0-20220128052735-680ed4f96095
 	go.opentelemetry.io/otel v1.36.0
 	go.opentelemetry.io/otel/metric v1.36.0
@@ -25,9 +28,7 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	github.com/sigmonsays/git-watch v0.0.7 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
