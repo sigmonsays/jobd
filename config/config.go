@@ -13,8 +13,13 @@ import (
 type AppConfig struct {
 	HttpAddr      string         `yaml:"http_addr"`
 	DataDir       string         `yaml:"datadir"`
+	Defaults      *Defaults      `yaml:"defaults"`
 	ShellDefaults *job.ShellSpec `yaml:"shell_defaults"`
 	Jobs          []*job.JobSpec
+}
+
+type Defaults struct {
+	Keep int
 }
 
 func (c *AppConfig) LoadYaml(path string) error {

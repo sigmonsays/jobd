@@ -199,6 +199,11 @@ func run(cfg *config.AppConfig, opts *Options) error {
 // set defaults on the jobs
 func SetJobDefaults(cfg *config.AppConfig) error {
 	for _, job := range cfg.Jobs {
+
+		if job.Keep == 0 && cfg.Defaults.Keep > 0 {
+			job.Keep = cfg.Defaults.Keep
+		}
+
 		if job.Directory == "" {
 			job.Directory = filepath.Join(cfg.DataDir, "jobs", job.JobId)
 		}
