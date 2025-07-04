@@ -180,16 +180,12 @@ func run(cfg *config.AppConfig, opts *Options) error {
 		sched.AddJob(j)
 
 		// start any polling if git remote is set
-		if job_spec.Upstream.Git.Remote != "" {
+		if job_spec.Upstream.Git.Remote != "" && job_spec.Upstream.Git.Branch != "" {
 			go polling.JobPoller(job_spec, app.Context)
 		}
 
 		if job_spec.Immediate {
-			go func() {
-				opts := schedule.DefaultExecuteOptions()
-				opts.Stackable = job_spec.Stackable
-				exec.Execute(j.Id, rj, opts)
-			}()
+			go schedule.RunJobSpec(exec, job_spec)
 		}
 	}
 
