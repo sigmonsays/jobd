@@ -1,0 +1,291 @@
+openapi: "3.0.0"
+
+info:
+  title: jobd
+  summary: simple cicd job daemon
+  description: |
+    lightweight cicd daemon
+  version: '1.0'
+  contact:
+    name: 'dev'
+    email: dev@example.com
+
+externalDocs:
+  description: Find out more about jobd
+  url: https://github.com/sigmonsays/jobd
+
+
+paths:
+
+  /api/job:
+
+    # CreateJob api-path POST /api/job
+    # post:
+    #   summary: CreateJob
+    #   description: |
+    #     create a new job
+    #
+    #   operationId: CreateJob
+    #   tags:
+    #     - job
+    #   requestBody:
+    #     required: true
+    #     content:
+    #       application/json:
+    #         schema:
+    #           $ref: '#/components/schemas/CreateJobRequest'
+    #   responses:
+    #     '200':
+    #       description: Successful operation
+    #       content:
+    #         application/json:
+    #           schema:
+    #            $ref: '#/components/schemas/CreateJobResponse'
+    #     '400':
+    #       $ref: '#/components/responses/BadRequest'
+    #     '401':
+    #       $ref: '#/components/responses/GenericError'
+    #     '403':
+    #       $ref: '#/components/responses/AuthenticationError'
+    #     '500':
+    #       $ref: '#/components/responses/GenericError'
+
+    # GetJob api-path GET /job
+    get:
+      summary: ListJob
+      description: list jobs
+      operationId: ListJob
+      tags:
+        - job
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListJobResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/AuthenticationError'
+        '500':
+          $ref: '#/components/responses/GenericError'
+
+  /api/job/run:
+
+    #RunJob api-path POST /api/job
+    post:
+      summary: RunJob
+      description: |
+        run a job
+
+      operationId: RunJob
+      tags:
+        - job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunJobRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/RunJobResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/GenericError'
+        '403':
+          $ref: '#/components/responses/AuthenticationError'
+        '500':
+          $ref: '#/components/responses/GenericError'
+
+
+  /api/ping:
+    # Ping api-path POST /ping
+    get:
+      summary: Ping
+      description: |
+        ping server
+      operationId: Ping
+      tags:
+        - misc
+      parameters:
+        - in: query
+          name: message
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/AuthenticationError'
+        '500':
+          $ref: '#/components/responses/GenericError'
+
+
+components:
+
+  responses:
+
+    # http 403
+    AuthenticationError:
+         description: Authentication Error
+         content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/ApiErrorAuthError'
+
+    # http 400
+    BadRequest:
+         description: Bad Request
+         content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/ApiErrorGenericError'
+
+    # http 500
+    GenericError:
+         description: Generic Error
+         content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/ApiErrorGenericError'
+
+
+  securitySchemes:
+    jwt_auth:
+      description: JWT HMAC-SHA256
+      in: header
+      name: X-Api-Key
+      type: apiKey
+
+
+  schemas:
+
+    # Primitive types
+    ApiErrorAuthError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          example: auth-error
+          type: string
+        message:
+          example: more details of error
+          type: string
+
+    ApiErrorPermError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          example: permission-error
+          type: string
+        message:
+          example: more details of error
+          type: string
+
+    ApiErrorGenericError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          example: generic-error
+          type: string
+        message:
+          example: more details of error
+          type: string
+
+    Job:
+      type: object
+      # required:
+      #   - name
+      properties:
+        jid:
+          description: job id
+          type: string
+          maxLength: 63
+          minLength: 3
+        nsteps:
+          type: integer
+          format: int32
+          description: number of steps
+        exitcode:
+          type: integer
+          format: int32
+          description: last run exit code
+
+
+    # ---- ListJob -------
+
+    ListJobResponse:
+      type: object
+      properties:
+        jobs:
+          type: array
+          description: bucket name
+          items:
+            $ref: '#/components/schemas/Job'
+
+    # ---- CreatJobRequest -------
+
+    CreateJobRequest:
+      type: object
+      properties:
+        job:
+          $ref: '#/components/schemas/Job'
+
+    CreateJobResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: job status
+
+    # ---- PingRequest -------
+
+    PingRequest:
+      type: object
+      properties:
+        message:
+          type: string
+
+    PingResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: ping response
+
+    # ---- CreatJobRequest -------
+
+    RunJobRequest:
+      type: object
+      properties:
+        jobid:
+          type: string
+          description: job id
+
+    RunJobResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: job status

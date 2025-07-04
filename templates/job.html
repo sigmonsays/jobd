@@ -1,0 +1,34 @@
+{{define "job"}}
+{{template "header" . }}
+<meta http-equiv="refresh" content="30">
+
+<h1>job {{ .Job.JobId }}</h1>
+
+Today {{ now }}<br>
+Prev {{ .NextRun.Prev }}<br>
+Next {{ .NextRun.Next }}<br>
+
+<h2>Run Detail</h2>
+
+<pre>
+{{ .RunSpec.GetLastLogs 1000 | escape }}
+</pre>
+
+
+<h2>Job Detail</h2>
+<table width=100% style="vertical-align: top;">
+<tr>
+<td>
+    Job:<br> <pre>{{ .Job | tojson }}</pre>
+</td>
+<td>
+    RunSpec:<br> <pre>{{ .RunSpec | tojson }}</pre>
+</td>
+<td>
+    RunShed:<br> <pre>{{ .RunShed | tojson }}</pre>
+</td>
+</tr>
+<table>
+
+{{template "footer" . }}
+{{end}}

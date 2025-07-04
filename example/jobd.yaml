@@ -1,0 +1,16 @@
+defaults:
+  shell:
+    timeout: 300
+jobs:
+
+  - jobid: date
+    schedule: 86400
+    steps:
+    - shell:
+        script: date
+
+  - jobid: df
+    schedule: 3600
+    steps:
+    - shell:
+        script: df -h
