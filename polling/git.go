@@ -32,6 +32,7 @@ func CloneRepo(j *job.JobSpec, gitDir string) error {
 	if err != nil {
 		return err
 	}
+	slog.Debug("finished git clone", "jid", j.JobId, "remote", j.Upstream.Git.Remote)
 	return nil
 }
 
@@ -58,5 +59,6 @@ func PullRepo(j *job.JobSpec, gitDir string) error {
 	if err != nil {
 		return err
 	}
+	slog.Debug("finished git pull", "jid", j.JobId, "remote", j.Upstream.Git.Remote)
 	return nil
 }

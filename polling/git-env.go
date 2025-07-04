@@ -37,7 +37,10 @@ func env_ssh_command(
 	if err != nil {
 		sshbin = "ssh"
 	}
-	ssh_opts := makeControlSocket(j, identityFile)
+	ssh_opts := ""
+
+	// ssh_opts += makeControlSocket(j, identityFile)
+
 	if identityFile != "" {
 		ssh_opts += " -i " + identityFile
 	}
