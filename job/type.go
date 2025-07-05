@@ -100,11 +100,12 @@ type ShellSpec struct {
 
 // the run of a specific job
 type RunSpec struct {
-	JobId   string
-	RunId   int
-	RunDir  string
-	WorkDir string
-	LogFile io.Writer `json:"-"`
+	JobId       string
+	RunId       int
+	RunDir      string
+	WorkDir     string
+	UpstreamDir string
+	LogFile     io.Writer `json:"-"`
 
 	EnvFile string
 

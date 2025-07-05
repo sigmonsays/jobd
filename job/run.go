@@ -32,9 +32,13 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	runid_str := fmt.Sprintf("%d", runid)
 	rundir := filepath.Join(rundir_base, runid_str, "")
 	workdir := filepath.Join(rundir, "workspace")
+	upstreamdir := filepath.Join(job.Directory, "upstream")
 	os.MkdirAll(rundir, 0700)
 	os.MkdirAll(workdir, 0700)
 	envfile := filepath.Join(rundir, "shell.env")
+
+	// prepare the workspace directory with the upstream repo
+	// todo: At some point we should properly checkout the hash that triggered the build
 
 	// make vars api
 	vars := NewVars(job.VarPrefix)
@@ -42,12 +46,13 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 	// build run spec
 	runSpec := &RunSpec{
-		JobId:   job.JobId,
-		RunId:   runid,
-		RunDir:  rundir,
-		WorkDir: workdir,
-		Vars:    vars,
-		EnvFile: envfile,
+		JobId:       job.JobId,
+		RunId:       runid,
+		RunDir:      rundir,
+		WorkDir:     workdir,
+		UpstreamDir: upstreamdir,
+		Vars:        vars,
+		EnvFile:     envfile,
 	}
 
 	envbuf := bytes.NewBuffer(nil)
