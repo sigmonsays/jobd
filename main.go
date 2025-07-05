@@ -162,20 +162,11 @@ func run(cfg *config.AppConfig, opts *Options) error {
 			continue
 		}
 
-		rj := &job.RunJob{
-			JobSpec: job_spec,
-		}
-
 		j := schedule.NewJob()
 		j.Id = job_spec.JobId
 		j.Schedule = job_spec.Schedule
 		j.Fn = func() error {
-			// todo: We can probably refactor this
-			j.SetRunning(true)
-			defer j.SetRunning(false)
-			opts := schedule.DefaultExecuteOptions()
-			opts.Stackable = job_spec.Stackable
-			return exec.Execute(job_spec.JobId, rj, opts)
+			return schedule.RunJobSpec(exec, job_spec)
 		}
 
 		err := sched.AddJob(j)

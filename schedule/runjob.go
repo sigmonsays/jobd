@@ -7,7 +7,7 @@ import (
 )
 
 // helper function to make a job spec runnable and execute it
-func RunJobSpec(executor *Executor, j *job.JobSpec) {
+func RunJobSpec(executor *Executor, j *job.JobSpec) error {
 	runnable := &job.RunJob{JobSpec: j}
 	opts := DefaultExecuteOptions()
 	opts.Stackable = j.Stackable
@@ -15,5 +15,5 @@ func RunJobSpec(executor *Executor, j *job.JobSpec) {
 	if err != nil {
 		slog.Warn("Execute job error", "err", err)
 	}
-
+	return err
 }
