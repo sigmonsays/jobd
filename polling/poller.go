@@ -32,13 +32,14 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	if setupDir {
 		err := CloneRepo(j, gitDir)
 		if err != nil {
-			slog.Warn("git clone error", "error", err)
+			slog.Warn("git clone error: CloneRepo", "error", err)
 		}
 	}
 
 	// get a handle on the jobs scheduler context
 	shedJob, err := appCtx.Scheduler.FindJobByName(j.JobId)
 	if err != nil {
+		slog.Warn("git clone error: FindJobByName", "error", err)
 		return err
 	}
 
@@ -57,7 +58,7 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 		return nil
 	}
 	gitWatch.OnCheck = func(dir, branch, lhash, rhash string) error {
-		slog.Debug("Check upstream for changes", "dir", dir)
+		// slog.Debug("Check upstream for changes", "dir", dir)
 		return nil
 	}
 	gitWatch.Start()

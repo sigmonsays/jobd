@@ -96,11 +96,18 @@ func (me *CronJob) Run() {
 func (me *Scheduler) AddJob(j *Job) error {
 	me.Jobs = append(me.Jobs, j)
 	cj := &CronJob{j}
-	eid, err := me.c.AddJob(j.Schedule, cj)
-	if err != nil {
-		return err
+
+	var eid cron.EntryID
+	var err error
+
+	if j.Schedule != "" {
+		eid, err = me.c.AddJob(j.Schedule, cj)
+		if err != nil {
+			return err
+		}
+		slog.Info("Scheduled job", "jid", j.Id, "eid", eid)
+
 	}
-	slog.Info("Scheduled job", "jid", j.Id, "eid", eid)
 
 	me.saveJob(j, int(eid))
 
@@ -121,6 +128,7 @@ func (me *Scheduler) StopJob(jid string) error {
 	return nil
 }
 
+// saving a job with eid is valid since the scheduler tracks jobs even without schedules
 func (me *Scheduler) saveJob(j *Job, eid int) error {
 	me.mx.Lock()
 	defer me.mx.Unlock()

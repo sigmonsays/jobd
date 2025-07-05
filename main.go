@@ -178,11 +178,9 @@ func run(cfg *config.AppConfig, opts *Options) error {
 			return exec.Execute(job_spec.JobId, rj, opts)
 		}
 
-		if j.Schedule != "" {
-			err := sched.AddJob(j)
-			if err != nil {
-				slog.Warn("scheduler AddJob error", "jid", j.Id, "error", err)
-			}
+		err := sched.AddJob(j)
+		if err != nil {
+			slog.Warn("scheduler AddJob error", "jid", j.Id, "error", err)
 		}
 
 		// start any polling if git remote is set
