@@ -12,6 +12,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/sigmonsays/jobd/git"
 )
 
 type RunJob struct {
@@ -32,9 +34,28 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	runid_str := fmt.Sprintf("%d", runid)
 	rundir := filepath.Join(rundir_base, runid_str, "")
 	workdir := filepath.Join(rundir, "workspace")
+	upstreamdir := filepath.Join(job.Directory, "upstream")
 	os.MkdirAll(rundir, 0700)
 	os.MkdirAll(workdir, 0700)
 	envfile := filepath.Join(rundir, "shell.env")
+
+	// common git options
+	gitOpts := git.DefaultGitOptions()
+	gitOpts.IdentityFile = job.Upstream.Git.IdentityFile
+
+	// prepare the workspace directory with the upstream repo
+	refSpec := ""
+	// todo: At some point we should properly checkout the hash that triggered the build
+	// for now, just use the hash from the last git pull in the upstream directory
+	upstreamHash := git.LocalHash(gitOpts, upstreamdir, job.Upstream.Git.Branch)
+	if upstreamHash != "" {
+		refSpec = upstreamHash
+	}
+
+	err = git.CloneRepoWithHash(gitOpts, job.Upstream.Git.Remote, refSpec, workdir)
+	if err != nil {
+		return nil, err
+	}
 
 	// make vars api
 	vars := NewVars(job.VarPrefix)
@@ -42,12 +63,13 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 	// build run spec
 	runSpec := &RunSpec{
-		JobId:   job.JobId,
-		RunId:   runid,
-		RunDir:  rundir,
-		WorkDir: workdir,
-		Vars:    vars,
-		EnvFile: envfile,
+		JobId:       job.JobId,
+		RunId:       runid,
+		RunDir:      rundir,
+		WorkDir:     workdir,
+		UpstreamDir: upstreamdir,
+		Vars:        vars,
+		EnvFile:     envfile,
 	}
 
 	envbuf := bytes.NewBuffer(nil)

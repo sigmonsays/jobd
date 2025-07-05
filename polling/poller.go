@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/sigmonsays/jobd/core"
+	"github.com/sigmonsays/jobd/git"
 	"github.com/sigmonsays/jobd/job"
 	"github.com/sigmonsays/jobd/schedule"
 
@@ -21,6 +22,7 @@ type GitUpstreamNotify struct {
 func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	// todo: Make polling interval configurable
 	pollInt := 30
+	slog.Debug("Starting poller for job", "jid", j.JobId, "poll_interval", pollInt)
 
 	// clone repo first if needed
 	gitDir := filepath.Join(j.Directory, "upstream")
@@ -28,16 +30,19 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	os.MkdirAll(baseDir, 0766)
 	_, err := os.Stat(gitDir)
 	setupDir := err != nil && os.IsNotExist(err)
+	opts := git.DefaultGitOptions()
+	opts.IdentityFile = j.Upstream.Git.IdentityFile
 	if setupDir {
-		err := CloneRepo(j, gitDir)
+		err := git.CloneRepo(opts, j.Upstream.Git.Remote, gitDir)
 		if err != nil {
-			slog.Warn("git clone error", "error", err)
+			slog.Warn("git clone error: CloneRepo", "error", err)
 		}
 	}
 
 	// get a handle on the jobs scheduler context
 	shedJob, err := appCtx.Scheduler.FindJobByName(j.JobId)
 	if err != nil {
+		slog.Warn("git clone error: FindJobByName", "error", err)
 		return err
 	}
 
@@ -47,6 +52,7 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	// git is the only backend
 	gitWatch := git_watch.NewGitWatch(gitDir, j.Upstream.Git.Branch)
 	gitWatch.Interval = pollInt
+	// todo: Support passing identity file through to git watch
 	changes := make(chan *GitUpstreamNotify, 5)
 	gitWatch.OnChange = func(dir, branch, lhash, rhash string) error {
 		changes <- &GitUpstreamNotify{
@@ -56,7 +62,7 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 		return nil
 	}
 	gitWatch.OnCheck = func(dir, branch, lhash, rhash string) error {
-		slog.Debug("Check upstream for changes", "dir", dir)
+		// slog.Debug("Check upstream for changes", "dir", dir)
 		return nil
 	}
 	gitWatch.Start()
@@ -68,7 +74,9 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 			LocalHash:  "",
 			RemoteHash: "",
 		}
+		slog.Debug("triggering run due to initial setup of repo", "remote", j.Upstream.Git.Remote)
 	}
+	slog.Debug("poller started", "remote", j.Upstream.Git.Remote)
 
 	// todo: Wire up job schedule stopping (JobCtx) here
 Dance:
@@ -87,7 +95,12 @@ Dance:
 func RepoChange(appCtx *core.Context, j *job.JobSpec, gitDir string, change *GitUpstreamNotify) error {
 
 	// pull git repo
-	PullRepo(j, gitDir)
+	opts := git.DefaultGitOptions()
+	opts.IdentityFile = j.Upstream.Git.IdentityFile
+	err := git.PullRepo(opts, gitDir)
+	if err != nil {
+		return err
+	}
 
 	// run job
 	// todo: Pass change event into job somehow

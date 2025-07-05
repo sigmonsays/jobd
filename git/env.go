@@ -1,4 +1,4 @@
-package polling
+package git
 
 import (
 	"log/slog"
@@ -7,19 +7,17 @@ import (
 	"strings"
 
 	"github.com/shurcooL/go/osutil"
-	"github.com/sigmonsays/jobd/job"
 )
 
 // populate git env
 // see https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables
-func populateEnv(e []string, j *job.JobSpec) []string {
-	cfg := j.Upstream.Git
+func populateEnv(e []string, identityfile string) []string {
 
 	e = append(e, "GIT_CONFIG_NOSYSTEM=1")
 	e = append(e, "GIT_PAGER=cat")
 
-	if cfg.IdentityFile != "" {
-		e = env_ssh_command(j, e, cfg.IdentityFile)
+	if identityfile != "" {
+		e = env_ssh_command(e, identityfile)
 		return e
 	}
 
@@ -28,7 +26,6 @@ func populateEnv(e []string, j *job.JobSpec) []string {
 }
 
 func env_ssh_command(
-	j *job.JobSpec,
 	e []string,
 	identityFile string,
 ) []string {
@@ -45,13 +42,13 @@ func env_ssh_command(
 		ssh_opts += " -i " + identityFile
 	}
 	ssh_command := sshbin + " " + strings.Trim(ssh_opts, " ")
-	slog.Debug("setting GIT_SSH_COMMAND", "jid", j.JobId, "GIT_SSH_COMMAND", ssh_command)
+	slog.Debug("setting GIT_SSH_COMMAND", "GIT_SSH_COMMAND", ssh_command)
 	env := osutil.Environ(e)
 	env.Set("GIT_SSH_COMMAND", ssh_command)
 	return env
 }
 
-func makeControlSocket(j *job.JobSpec, ident string) string {
+func makeControlSocket(ident string) string {
 	// todo: Do a better job with the identity file
 	b := filepath.Base(ident)
 	// maybe IdentitiesOnly=yes  ?

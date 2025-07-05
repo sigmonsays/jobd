@@ -170,14 +170,18 @@ func run(cfg *config.AppConfig, opts *Options) error {
 		j.Id = job_spec.JobId
 		j.Schedule = job_spec.Schedule
 		j.Fn = func() error {
+			// todo: We can probably refactor this
 			j.SetRunning(true)
 			defer j.SetRunning(false)
 			opts := schedule.DefaultExecuteOptions()
 			opts.Stackable = job_spec.Stackable
-
 			return exec.Execute(job_spec.JobId, rj, opts)
 		}
-		sched.AddJob(j)
+
+		err := sched.AddJob(j)
+		if err != nil {
+			slog.Warn("scheduler AddJob error", "jid", j.Id, "error", err)
+		}
 
 		// start any polling if git remote is set
 		if job_spec.Upstream.Git.Remote != "" && job_spec.Upstream.Git.Branch != "" {
