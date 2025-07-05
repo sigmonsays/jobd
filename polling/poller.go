@@ -52,6 +52,7 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	// git is the only backend
 	gitWatch := git_watch.NewGitWatch(gitDir, j.Upstream.Git.Branch)
 	gitWatch.Interval = pollInt
+	// todo: Support passing identity file through to git watch
 	changes := make(chan *GitUpstreamNotify, 5)
 	gitWatch.OnChange = func(dir, branch, lhash, rhash string) error {
 		changes <- &GitUpstreamNotify{
