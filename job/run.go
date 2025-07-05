@@ -44,17 +44,20 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	gitOpts.IdentityFile = job.Upstream.Git.IdentityFile
 
 	// prepare the workspace directory with the upstream repo
-	refSpec := ""
-	// todo: At some point we should properly checkout the hash that triggered the build
-	// for now, just use the hash from the last git pull in the upstream directory
-	upstreamHash := git.LocalHash(gitOpts, upstreamdir, job.Upstream.Git.Branch)
-	if upstreamHash != "" {
-		refSpec = upstreamHash
-	}
+	if job.Upstream.Git.Remote != "" {
 
-	err = git.CloneRepoWithHash(gitOpts, job.Upstream.Git.Remote, refSpec, workdir)
-	if err != nil {
-		return nil, err
+		refSpec := ""
+		// todo: At some point we should properly checkout the hash that triggered the build
+		// for now, just use the hash from the last git pull in the upstream directory
+		upstreamHash := git.LocalHash(gitOpts, upstreamdir, job.Upstream.Git.Branch)
+		if upstreamHash != "" {
+			refSpec = upstreamHash
+		}
+
+		err = git.CloneRepoWithHash(gitOpts, job.Upstream.Git.Remote, refSpec, workdir)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// make vars api
