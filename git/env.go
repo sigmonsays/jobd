@@ -49,7 +49,6 @@ func env_ssh_command(
 }
 
 func makeControlSocket(ident string) string {
-	// todo: Do a better job with the identity file
 	b := filepath.Base(ident)
 	// maybe IdentitiesOnly=yes  ?
 	ret := " -oControlMaster=auto "
