@@ -2,6 +2,7 @@ package schedule
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"sync"
@@ -168,6 +169,17 @@ type Job struct {
 
 	JobCtx     context.Context
 	CancelFunc func()
+}
+
+func (me *Job) MarshalJSON() ([]byte, error) {
+	m := map[string]any{
+		"eid":      me.Eid,
+		"schedule": me.Schedule,
+		"running":  me.Running,
+		"started":  me.Started.Format(time.RFC3339),
+		"stopped":  me.Stopped.Format(time.RFC3339),
+	}
+	return json.Marshal(m)
 }
 
 func (me *Job) SetEid(eid int) {
