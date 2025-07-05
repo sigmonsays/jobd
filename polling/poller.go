@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/sigmonsays/jobd/core"
+	"github.com/sigmonsays/jobd/git"
 	"github.com/sigmonsays/jobd/job"
 	"github.com/sigmonsays/jobd/schedule"
 
@@ -29,8 +30,10 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	os.MkdirAll(baseDir, 0766)
 	_, err := os.Stat(gitDir)
 	setupDir := err != nil && os.IsNotExist(err)
+	opts := git.DefaultGitOptions()
+	opts.IdentityFile = j.Upstream.Git.IdentityFile
 	if setupDir {
-		err := CloneRepo(j, gitDir)
+		err := git.CloneRepo(opts, j.Upstream.Git.Remote, gitDir)
 		if err != nil {
 			slog.Warn("git clone error: CloneRepo", "error", err)
 		}
@@ -91,7 +94,12 @@ Dance:
 func RepoChange(appCtx *core.Context, j *job.JobSpec, gitDir string, change *GitUpstreamNotify) error {
 
 	// pull git repo
-	PullRepo(j, gitDir)
+	opts := git.DefaultGitOptions()
+	opts.IdentityFile = j.Upstream.Git.IdentityFile
+	err := git.PullRepo(opts, gitDir)
+	if err != nil {
+		return err
+	}
 
 	// run job
 	// todo: Pass change event into job somehow

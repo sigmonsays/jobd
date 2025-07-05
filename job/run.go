@@ -12,6 +12,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/sigmonsays/jobd/git"
 )
 
 type RunJob struct {
@@ -39,6 +41,10 @@ func Run(job *JobSpec) (*RunSpec, error) {
 
 	// prepare the workspace directory with the upstream repo
 	// todo: At some point we should properly checkout the hash that triggered the build
+	refSpec := ""
+	gitOpts := git.DefaultGitOptions()
+	gitOpts.IdentityFile = job.Upstream.Git.IdentityFile
+	git.CloneRepoWithHash(gitOpts, job.Upstream.Git.Remote, refSpec, workdir)
 
 	// make vars api
 	vars := NewVars(job.VarPrefix)
