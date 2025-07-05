@@ -21,6 +21,7 @@ type GitUpstreamNotify struct {
 func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 	// todo: Make polling interval configurable
 	pollInt := 30
+	slog.Debug("Starting poller for job", "jid", j.JobId, "poll_interval", pollInt)
 
 	// clone repo first if needed
 	gitDir := filepath.Join(j.Directory, "upstream")
@@ -68,7 +69,9 @@ func JobPoller(j *job.JobSpec, appCtx *core.Context) error {
 			LocalHash:  "",
 			RemoteHash: "",
 		}
+		slog.Debug("triggering run due to initial setup of repo", "remote", j.Upstream.Git.Remote)
 	}
+	slog.Debug("poller started", "remote", j.Upstream.Git.Remote)
 
 	// todo: Wire up job schedule stopping (JobCtx) here
 Dance:
