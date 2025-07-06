@@ -1,9 +1,12 @@
 package ui
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/sigmonsays/jobd/job"
 	"github.com/sigmonsays/jobd/schedule"
@@ -40,6 +43,18 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 	// ensure we have a executing job
 	jresult, err := me.Context.Executor.GetResult(jid)
 	if err != nil {
+
+		// try file system
+		rundir := filepath.Join(jobSpec.Directory, "run")
+		maxrun, err := job.GetMaxRun(rundir)
+		runid := fmt.Sprintf("%d", maxrun)
+		resultFile := filepath.Join(rundir, runid, "result.json")
+		buf, err := os.ReadFile(resultFile)
+		if err == nil {
+			json.Unmarshal(buf, &jresult)
+			slog.Debug("Loaded job result from disk", "result_file", resultFile)
+		}
+
 	}
 
 	incomplete := false
