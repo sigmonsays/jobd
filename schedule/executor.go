@@ -14,14 +14,25 @@ import (
 	"github.com/sigmonsays/jobd/job"
 )
 
-func NewExecutor() *Executor {
+func DefaultExecutorOptions() *ExecutorOptions {
+	return &ExecutorOptions{}
+}
+
+type ExecutorOptions struct {
+	JobDir string
+}
+
+func NewExecutor(opts *ExecutorOptions) *Executor {
 	return &Executor{
+		opts:    opts,
 		results: make(map[string]*Result, 0),
 		running: make(map[string]bool, 0),
 	}
 }
 
 type Executor struct {
+	opts *ExecutorOptions
+
 	claimLock sync.Mutex
 	mx        sync.Mutex
 
@@ -111,11 +122,57 @@ func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error 
 }
 
 func (me *Executor) GetResult(jid string) (*Result, error) {
+
+	res, err := me.GetResultMemory(jid)
+	if err != nil {
+		var ee *ExecutorError
+		if errors.As(err, &ee) {
+			if ee.Reason == "NOT_FOUND" {
+				slog.Debug("GetResult ExecutorError", "jid", jid, "ee", ee)
+			} else {
+				return nil, err
+			}
+		}
+	}
+
+	if res != nil {
+		return res, nil
+	}
+
+	// try file system
+	slog.Debug("GetResult, trying filesystem", "jid", jid)
+	jobDir := filepath.Join(me.opts.JobDir, jid)
+	rundir := filepath.Join(jobDir, "run")
+	maxrun, err := job.GetMaxRun(rundir)
+	runid := fmt.Sprintf("%d", maxrun)
+	resultFile := filepath.Join(rundir, runid, "result.json")
+	buf, err := os.ReadFile(resultFile)
+	if err == nil {
+		json.Unmarshal(buf, &res)
+		slog.Debug("Loaded job result from disk", "result_file", resultFile)
+	} else {
+		slog.Debug("Error loading job result from disk", "result_file", resultFile, "err", err)
+
+	}
+
+	return res, err
+}
+
+type ExecutorError struct {
+	Reason string
+}
+
+func (me *ExecutorError) Error() string {
+	return "ExecutorError:" + me.Reason
+}
+
+func (me *Executor) GetResultMemory(jid string) (*Result, error) {
 	me.mx.Lock()
 	defer me.mx.Unlock()
 	res, found := me.results[jid]
 	if !found {
-		return nil, fmt.Errorf("executor jid not found:%s", jid)
+		e := &ExecutorError{"NOT_FOUND"}
+		return nil, fmt.Errorf("executor jid not found: %w", e)
 	}
 	return res, nil
 }

@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/sigmonsays/jobd/git"
+	"github.com/sigmonsays/jobd/util"
 )
 
 type RunJob struct {
@@ -114,9 +115,10 @@ func Run(job *JobSpec) (*RunSpec, error) {
 		}
 
 		stepRes := &StepResult{
-			Id:    step.Id,
-			Index: step_idx,
-			Step:  step,
+			Id:       step.Id,
+			Index:    step_idx,
+			Step:     step,
+			duration: util.NewDurationMeasure(true),
 		}
 		runSpec.StepResults = append(runSpec.StepResults, stepRes)
 
@@ -154,12 +156,18 @@ func Run(job *JobSpec) (*RunSpec, error) {
 					runSpec.Logf("run job jid:%s runid:%d: exit error %s",
 						job.JobId, runSpec.RunId, ee)
 
+					stepRes.ExitCode = ee.ExitCode()
+
 				} else {
 					runSpec.Logf("run job jid:%s runid:%d: generic error %s",
 						job.JobId, runSpec.RunId, err)
 				}
 			}
+
 		}
+
+		stepRes.duration.StopTimer()
+		stepRes.DurationSec = int(stepRes.duration.GetDurationSec())
 
 	}
 
