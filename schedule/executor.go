@@ -1,10 +1,13 @@
 package schedule
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -92,12 +95,21 @@ func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error 
 	}
 
 	slog.Debug("Execute job return", "jid", jid, "result", res)
+
+	// save results on disk
+	resultFile := filepath.Join(runSpec.RunDir, "result.json")
+	rbuf, _ := json.Marshal(res)
+	os.WriteFile(resultFile, rbuf, 0644)
+	slog.Debug("saved results file", "jid", jid, "result_file", resultFile)
+
+	// save results ni memory
 	me.mx.Lock()
 	me.results[jid] = res
 	me.mx.Unlock()
 
 	return err
 }
+
 func (me *Executor) GetResult(jid string) (*Result, error) {
 	me.mx.Lock()
 	defer me.mx.Unlock()

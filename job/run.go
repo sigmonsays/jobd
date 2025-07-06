@@ -26,7 +26,7 @@ func (me *RunJob) Run() (*RunSpec, error) {
 
 func Run(job *JobSpec) (*RunSpec, error) {
 	rundir_base := filepath.Join(job.Directory, "run")
-	runid, err := getMaxRun(rundir_base)
+	runid, err := GetMaxRun(rundir_base)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func captureVariables(vars_spec []*JobVars, runSpec *RunSpec, vars *VarSet) erro
 }
 
 // return the highest integer directory in the jobs rundir
-func getMaxRun(rundir string) (int, error) {
+func GetMaxRun(rundir string) (int, error) {
 	ret := 0
 
 	files, err := ioutil.ReadDir(rundir)
