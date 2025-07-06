@@ -133,6 +133,7 @@ type StepResult struct {
 	Index       int
 	Step        *JobStep
 	Error       string
+	ExitCode    int
 	DurationSec int
 
 	duration *util.DurationMeasure

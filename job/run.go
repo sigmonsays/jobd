@@ -156,6 +156,8 @@ func Run(job *JobSpec) (*RunSpec, error) {
 					runSpec.Logf("run job jid:%s runid:%d: exit error %s",
 						job.JobId, runSpec.RunId, ee)
 
+					stepRes.ExitCode = ee.ExitCode()
+
 				} else {
 					runSpec.Logf("run job jid:%s runid:%d: generic error %s",
 						job.JobId, runSpec.RunId, err)
