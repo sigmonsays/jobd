@@ -142,7 +142,10 @@ func run(cfg *config.AppConfig, opts *Options) error {
 	cfg.PrintConfig()
 
 	// start executor
-	exec := schedule.NewExecutor()
+
+	eopts := schedule.DefaultExecutorOptions()
+	eopts.JobDir = filepath.Join(cfg.DataDir, "jobs")
+	exec := schedule.NewExecutor(eopts)
 
 	// start scheduler
 	sched := schedule.NewScheduler()
