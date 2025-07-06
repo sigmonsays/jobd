@@ -5,6 +5,8 @@ import (
 	"io"
 	"log/slog"
 	"path/filepath"
+
+	"github.com/sigmonsays/jobd/util"
 )
 
 /*
@@ -127,10 +129,13 @@ func (me *RunSpec) Logf(s string, args ...any) {
 }
 
 type StepResult struct {
-	Id    string // step id
-	Index int
-	Step  *JobStep
-	Error string
+	Id          string // step id
+	Index       int
+	Step        *JobStep
+	Error       string
+	DurationSec int
+
+	duration *util.DurationMeasure
 }
 
 type JobVars struct {
