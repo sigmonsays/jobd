@@ -3,10 +3,10 @@
 <meta http-equiv="refresh" content="30">
 
 
-runs:
+run:<br>
 {{range $run := .Runs}}
 {{ if eq $run ( printf "%d" $.RunSpec.RunId ) }}
-<b><a href="/ui/job/{{$.Job.JobId}}/run/{{$run}}">{{$run}}</a></b> &nbsp;
+*<a href="/ui/job/{{$.Job.JobId}}/run/{{$run}}">{{$run}}</a>* &nbsp;
 {{else}}
 <a href="/ui/job/{{$.Job.JobId}}/run/{{$run}}">{{$run}}</a> &nbsp;
 {{end}}
