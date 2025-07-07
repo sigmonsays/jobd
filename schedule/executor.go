@@ -43,6 +43,7 @@ type Executor struct {
 
 type Runnable interface {
 	Run() (*job.RunSpec, error)
+	GetJobSpec() *job.JobSpec
 }
 
 func (me *Executor) unclaimJid(jid string) error {
@@ -75,6 +76,26 @@ type ExecuteOptions struct {
 
 func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error {
 	started := time.Now()
+	jobSpec := f.GetJobSpec()
+
+	// todo: we need to know the run id before the job starts
+	rundir := filepath.Join(jobSpec.Directory, "run")
+	runid, err := job.GetMaxRun(rundir)
+	runid = runid + 1 // just take next one here
+	runid_str := fmt.Sprintf("%d", runid)
+
+	// serialize the result file to disk right away even before we complete the run
+
+	resultFile := filepath.Join(rundir, runid_str, "result.json")
+	res := &Result{
+		Incomplete:     true,
+		StartTimestamp: time.Now(),
+		RunSpec: &job.RunSpec{
+			JobId: jid,
+		},
+	}
+	rbuf, _ := json.Marshal(res)
+	os.WriteFile(resultFile, rbuf, 0644)
 
 	if opts.Stackable == false {
 		// claim this slot so it only runs once
@@ -89,7 +110,7 @@ func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error 
 	// begin executing job
 	slog.Debug("Execute job", "jid", jid)
 	runSpec, err := f.Run()
-	res := &Result{
+	res = &Result{
 		Error:         err,
 		ExitCode:      0,
 		StopTimestamp: time.Now(),
@@ -108,8 +129,7 @@ func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error 
 	slog.Debug("Execute job return", "jid", jid, "result", res)
 
 	// save results on disk
-	resultFile := filepath.Join(runSpec.RunDir, "result.json")
-	rbuf, _ := json.Marshal(res)
+	rbuf, _ = json.Marshal(res)
 	os.WriteFile(resultFile, rbuf, 0644)
 	slog.Debug("saved results file", "jid", jid, "result_file", resultFile)
 
@@ -178,6 +198,8 @@ func (me *Executor) GetResultMemory(jid string) (*Result, error) {
 }
 
 type Result struct {
+	Incomplete bool
+
 	Error    error
 	ExitCode int
 

@@ -24,6 +24,9 @@ type RunJob struct {
 func (me *RunJob) Run() (*RunSpec, error) {
 	return Run(me.JobSpec)
 }
+func (me *RunJob) GetJobSpec() *JobSpec {
+	return me.JobSpec
+}
 
 func Run(job *JobSpec) (*RunSpec, error) {
 	rundir_base := filepath.Join(job.Directory, "run")

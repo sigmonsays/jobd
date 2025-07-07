@@ -115,5 +115,6 @@ func ListRuns(rundir string) ([]string, error) {
 		}
 		ret = append(ret, file.Name())
 	}
+
 	return ret, nil
 }
