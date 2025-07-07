@@ -2,8 +2,11 @@ package ui
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log/slog"
 	"net/http"
+	"path/filepath"
+	"strconv"
 
 	"github.com/sigmonsays/jobd/job"
 	"github.com/sigmonsays/jobd/schedule"
@@ -16,6 +19,7 @@ type ViewJobPage struct {
 	Schedule   *schedule.Job
 	Incomplete bool
 	NextRun    *schedule.Next
+	Runs       []string
 }
 
 func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +47,13 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+	// list runs for job
+	runbase := filepath.Join(jobSpec.Directory, "run")
+	runs, err := ListRuns(runbase)
+	if err != nil {
+
+	}
+
 	incomplete := false
 	if jobSpec == nil || shedJob == nil || jresult == nil {
 		incomplete = true
@@ -53,6 +64,7 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 		Job:        jobSpec,
 		Schedule:   shedJob,
 		Incomplete: incomplete,
+		Runs:       runs,
 	}
 	if jresult != nil {
 		data.RunSpec = jresult.RunSpec
@@ -82,4 +94,26 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Warn("Execute", "e", err)
 	}
+}
+
+func ListRuns(rundir string) ([]string, error) {
+	ret := make([]string, 0)
+	slog.Debug("ListRuns", "rundir", rundir)
+
+	files, err := ioutil.ReadDir(rundir)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, file := range files {
+		if !file.IsDir() {
+			continue
+		}
+		_, err := strconv.ParseInt(file.Name(), 10, 32)
+		if err != nil {
+			continue
+		}
+		ret = append(ret, file.Name())
+	}
+	return ret, nil
 }

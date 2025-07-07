@@ -2,6 +2,17 @@
 {{template "header" . }}
 <meta http-equiv="refresh" content="30">
 
+
+runs:
+{{range $run := .Runs}}
+{{ if eq $run ( printf "%d" $.RunSpec.RunId ) }}
+<b><a href="/ui/job/{{$.Job.JobId}}/run/{{$run}}">{{$run}}</a></b> &nbsp;
+{{else}}
+<a href="/ui/job/{{$.Job.JobId}}/run/{{$run}}">{{$run}}</a> &nbsp;
+{{end}}
+{{end}}
+
+
 <h1>job {{ .Job.JobId }}</h1>
 
 Today {{ now }}<br>
