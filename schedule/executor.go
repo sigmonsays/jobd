@@ -96,6 +96,7 @@ func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error 
 	}
 	rbuf, _ := json.Marshal(res)
 	os.WriteFile(resultFile, rbuf, 0644)
+	slog.Debug("wrote preliminary result.json file", "result_file", resultFile)
 
 	if opts.Stackable == false {
 		// claim this slot so it only runs once
