@@ -142,8 +142,10 @@ func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error 
 	return err
 }
 
-func (me *Executor) GetResult(jid string) (*Result, error) {
+// if runid is zero, latest result is returned
+func (me *Executor) GetResult(jid string, runid int) (*Result, error) {
 
+	// get latest result from memory
 	res, err := me.GetResultMemory(jid)
 	if err != nil {
 		var ee *ExecutorError
@@ -156,7 +158,8 @@ func (me *Executor) GetResult(jid string) (*Result, error) {
 		}
 	}
 
-	if res != nil {
+	// only return result from memory if it is our runid
+	if res != nil && runid > 0 && res.RunSpec.RunId == runid {
 		return res, nil
 	}
 
@@ -164,9 +167,11 @@ func (me *Executor) GetResult(jid string) (*Result, error) {
 	slog.Debug("GetResult, trying filesystem", "jid", jid)
 	jobDir := filepath.Join(me.opts.JobDir, jid)
 	rundir := filepath.Join(jobDir, "run")
-	maxrun, err := job.GetMaxRun(rundir)
-	runid := fmt.Sprintf("%d", maxrun)
-	resultFile := filepath.Join(rundir, runid, "result.json")
+	if runid == 0 {
+		runid, err = job.GetMaxRun(rundir)
+	}
+	runid_dir := fmt.Sprintf("%d", runid)
+	resultFile := filepath.Join(rundir, runid_dir, "result.json")
 	buf, err := os.ReadFile(resultFile)
 	if err == nil {
 		json.Unmarshal(buf, &res)
@@ -175,7 +180,6 @@ func (me *Executor) GetResult(jid string) (*Result, error) {
 		slog.Debug("Error loading job result from disk", "result_file", resultFile, "err", err)
 
 	}
-
 	return res, err
 }
 

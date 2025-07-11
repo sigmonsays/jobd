@@ -11,6 +11,7 @@ func (me *Api) ListJob(context context.Context) (api.ListJobRes, error) {
 	ret := &api.ListJobResponse{}
 
 	jids := me.JobConfig.ListJobs()
+	runid := 0
 
 	for _, jid := range jids {
 
@@ -20,7 +21,7 @@ func (me *Api) ListJob(context context.Context) (api.ListJobRes, error) {
 			continue
 		}
 
-		jres, err := me.Executor.GetResult(jid)
+		jres, err := me.Executor.GetResult(jid, runid)
 		if err != nil {
 			slog.Debug("GetResult error", "jid", jid, "err", err)
 		}

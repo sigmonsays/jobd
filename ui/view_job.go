@@ -28,6 +28,16 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 		me.handleErrorf(w, r, "missing jid")
 		return
 	}
+	runid_str := r.PathValue("run")
+	runid := 0
+	if runid_str != "" {
+		var err error
+		runid, err = strconv.Atoi(runid_str)
+		if err != nil {
+			me.handleErrorf(w, r, "invalid run: %s", err)
+		}
+		return
+	}
 
 	// find configured job
 	jobSpec, err := me.Context.JobConfig.GetConfig(jid)
@@ -42,7 +52,7 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// ensure we have a executing job
-	jresult, err := me.Context.Executor.GetResult(jid)
+	jresult, err := me.Context.Executor.GetResult(jid, runid)
 	if err != nil {
 
 	}
