@@ -113,6 +113,7 @@ func run(cfg *config.AppConfig, opts *Options) error {
 
 	mx.HandleFunc("/ui", api.RecoveryHandler(webui.Index))
 	mx.HandleFunc("/ui/job/{jid}", api.RecoveryHandler(webui.ViewJob))
+	mx.HandleFunc("/ui/job/{jid}/{run}", api.RecoveryHandler(webui.ViewJob))
 
 	httpsrv := http.Server{
 		Addr:    cfg.HttpAddr,

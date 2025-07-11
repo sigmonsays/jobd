@@ -35,8 +35,8 @@ func (me *Ui) ViewJob(w http.ResponseWriter, r *http.Request) {
 		runid, err = strconv.Atoi(runid_str)
 		if err != nil {
 			me.handleErrorf(w, r, "invalid run: %s", err)
+			return
 		}
-		return
 	}
 
 	// find configured job
