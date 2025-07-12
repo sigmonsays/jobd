@@ -15,7 +15,7 @@
     <td class="job"><a href="/ui/job/{{.JobSpec.JobId}}">{{ .JobSpec.JobId }}</a></td>
     {{if .RunId}}
     <td class="status">{{ .Status }}</td>
-    <td class="last-run">{{ .Timestamp }}</td>
+            <td class="last-run"><span title="{{.Timestamp}}">{{ .HumanTimestamp }}</span></td>
     <td class="run"><a href="/ui/job/{{.JobSpec.JobId}}/{{.RunId}}">{{ .RunId }}</a></td>
     {{else}}
     <td class="status">UNKNOWN</td>

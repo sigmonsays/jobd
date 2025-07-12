@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dustin/go-humanize"
 	"github.com/sigmonsays/jobd/job"
 	"github.com/sigmonsays/jobd/schedule"
 )
@@ -21,9 +22,9 @@ type JobEntry struct {
 	Schedule *schedule.Job
 
 	// latest info; status string
-	RunId     int
-	Status    string
-	Timestamp string
+	RunId                     int
+	Status                    string
+	Timestamp, HumanTimestamp string
 }
 
 func (me *Ui) Index(w http.ResponseWriter, r *http.Request) {
@@ -84,6 +85,7 @@ func (me *Ui) Index(w http.ResponseWriter, r *http.Request) {
 			}
 
 			jentry.Timestamp = jentry.RunSpec.StartTimestamp.Format(time.RFC3339)
+			jentry.HumanTimestamp = humanize.Time(jentry.RunSpec.StartTimestamp)
 			jentry.RunId = jentry.RunSpec.RunSpec.RunId
 		}
 
