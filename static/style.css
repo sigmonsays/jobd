@@ -1,3 +1,7 @@
-td {
+td, th {
     vertical-align: top;
+    #border: 1px solid black;
+    padding: 5px;
+    margin: 5px;
+    text-align: left;
 }

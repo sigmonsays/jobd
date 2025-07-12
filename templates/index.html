@@ -2,11 +2,29 @@
 {{template "header" . }}
 <h1>jobd</h1>
 
+<div class="items">
+<table style="border: none;">
+<tr>
+    <th>Job</th>
+    <th>Status</th>
+    <th>Timestamp</th>
+    <th>Run</th>
+</tr>
 {{range .Jobs}}
-<div class="item">
-    <span class="job"><a href="/ui/job/{{.JobId}}">{{ .JobId }}</a></span>
-    <span class="status">SUCCESS</status></span>
-</div>
+<tr>
+    <td class="job"><a href="/ui/job/{{.JobSpec.JobId}}">{{ .JobSpec.JobId }}</a></td>
+    {{if .RunId}}
+    <td class="status">{{ .Status }}</td>
+            <td class="last-run"><span title="{{.Timestamp}}">{{ .HumanTimestamp }}</span></td>
+    <td class="run"><a href="/ui/job/{{.JobSpec.JobId}}/{{.RunId}}">{{ .RunId }}</a></td>
+    {{else}}
+    <td class="status">UNKNOWN</td>
+    <td class="last-run"></td>
+    <td class="run"></td>
+    {{end}}
+</tr>
 {{end}}
+</table>
+</div>
 {{template "footer" . }}
 {{end}}

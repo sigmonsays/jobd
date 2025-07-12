@@ -2,6 +2,11 @@
 
 a simple cicd daemon for executing jobs on a schedule
 
+# features
+
+- simple design, no external runners, Single daemon, single config file
+
+
 # configuration
 
 default configuration

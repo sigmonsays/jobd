@@ -6,9 +6,9 @@
 run:<br>
 {{range $run := .Runs}}
 {{ if eq $run ( printf "%d" $.RunSpec.RunId ) }}
-*<a href="/ui/job/{{$.Job.JobId}}/run/{{$run}}">{{$run}}</a>* &nbsp;
+*<a href="/ui/job/{{$.Job.JobId}}/{{$run}}">{{$run}}</a>* &nbsp;
 {{else}}
-<a href="/ui/job/{{$.Job.JobId}}/run/{{$run}}">{{$run}}</a> &nbsp;
+<a href="/ui/job/{{$.Job.JobId}}/{{$run}}">{{$run}}</a> &nbsp;
 {{end}}
 {{end}}
 
@@ -16,18 +16,27 @@ run:<br>
 <h1>job {{ .Job.JobId }}</h1>
 
 Today {{ now }}<br>
-Prev {{ .NextRun.Prev }}<br>
-Next {{ .NextRun.Next }}<br>
+{{ if .NextRun.Prev }}
+    Prev {{ .NextRun.Prev }}
+{{ else }}
+    No Prev Run Time
+{{ end }}
+<br>
+{{ if .NextRun.Next }}
+    Next {{ .NextRun.Next }}<br>
+{{ else }}
+    No Next Run Time
+{{ end }}
 
 <h2>Latest Run Detail</h2>
 
-<pre>
+<textarea id=console style="width: 100%; height: 25%;">
 {{ .RunSpec.GetLastLogs 1000 | escape }}
-</pre>
+</textarea>
 
 
 <h2>Job Detail</h2>
-<table width=100% style="vertical-align: top;">
+<table style="vertical-align: top;">
 <tr>
 <td>
     Job:<br> <pre>{{ .Job | tojson }}</pre>
@@ -43,3 +52,10 @@ Next {{ .NextRun.Next }}<br>
 
 {{template "footer" . }}
 {{end}}
+
+<script language="javascript">
+document.onload = function() {
+    var textarea = document.getElementById('console');
+    textarea.scrollTop = textarea.scrollHeight;
+}
+</script>
