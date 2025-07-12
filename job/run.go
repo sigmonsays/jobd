@@ -110,7 +110,8 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	runSpec.Logf("run job jid:%s runid:%d",
 		job.JobId, runSpec.RunId)
 
-	for step_idx, step := range job.Steps {
+	for step_idx, _step := range job.Steps {
+		step := _step.Copy()
 
 		if step.Disabled {
 			runSpec.Logf("run step jid:%s step_num:%d: name:%s: step is disabled, skipping",

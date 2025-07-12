@@ -5,6 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"path/filepath"
+	"slices"
 
 	"github.com/sigmonsays/jobd/util"
 )
@@ -83,6 +84,14 @@ type JobStep struct {
 	Vars  []*JobVars
 }
 
+func (me *JobStep) Copy() *JobStep {
+	var s JobStep
+	s = *me
+	s.Shell = me.Shell.Copy()
+	s.Vars = slices.Clone(me.Vars)
+	return &s
+}
+
 type ShellSpec struct {
 
 	// the working directory
@@ -98,6 +107,12 @@ type ShellSpec struct {
 
 	// execution timeout
 	Timeout int
+}
+
+func (me *ShellSpec) Copy() *ShellSpec {
+	var s ShellSpec
+	s = *me
+	return &s
 }
 
 // the run of a specific job
