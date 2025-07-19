@@ -7,7 +7,10 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/sigmonsays/jobd/templates"
 )
 
 func (me *Ui) getTemplates() (*template.Template, error) {
@@ -17,15 +20,27 @@ func (me *Ui) getTemplates() (*template.Template, error) {
 		"version": app_version,
 		"tojson":  tojson,
 		"escape":  html.EscapeString,
+		"nl2br":   NewLineToBr,
 	}
+	if me.DevMode {
+		tmpl, err := template.New("jobd").
+			Funcs(fmap).
+			ParseGlob("./templates/*.html")
+		if err != nil {
+			return tmpl, err
+		}
+	}
+
 	tmpl, err := template.New("jobd").
 		Funcs(fmap).
-		ParseGlob("./templates/*.html")
+		ParseFS(templates.HTML, "*.html")
 	if err != nil {
 		return tmpl, err
 	}
-
 	return tmpl, err
+}
+func NewLineToBr(x string) string {
+	return strings.ReplaceAll(x, "\n", "<br>\n")
 }
 func app_version() string {
 	// todo

@@ -24,6 +24,7 @@ import (
 type Options struct {
 	ConfigFile string
 	LogLevel   string
+	DevMode    bool
 }
 
 func main() {
@@ -34,6 +35,8 @@ func main() {
 	}
 	flag.StringVar(&opts.ConfigFile, "config", opts.ConfigFile, "specify config file")
 	flag.StringVar(&opts.LogLevel, "loglevel", opts.LogLevel, "log level")
+	flag.StringVar(&opts.LogLevel, "l", opts.LogLevel, "log level")
+	flag.BoolVar(&opts.DevMode, "dev", opts.DevMode, "enable devmode")
 	flag.Parse()
 	cfg := config.GetDefaultConfig()
 
@@ -97,6 +100,7 @@ func run(cfg *config.AppConfig, opts *Options) error {
 	}
 	webui := &ui.Ui{
 		Context: ctx,
+		DevMode: opts.DevMode,
 	}
 	srv, err := api.NewServer(app)
 	if err != nil {

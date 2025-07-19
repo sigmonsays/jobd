@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -x
 gi || exit 1
-jobd -loglevel debug -config ~/jobd.yaml "$@"
+jobd -dev -loglevel debug -config ~/jobd.yaml "$@"
