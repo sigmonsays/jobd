@@ -11,6 +11,71 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
+// JobDetailParams is parameters of JobDetail operation.
+type JobDetailParams struct {
+	// Job id.
+	Jid OptString
+}
+
+func unpackJobDetailParams(packed middleware.Parameters) (params JobDetailParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "jid",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Jid = v.(OptString)
+		}
+	}
+	return params
+}
+
+func decodeJobDetailParams(args [0]string, argsEscaped bool, r *http.Request) (params JobDetailParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: jid.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "jid",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotJidVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotJidVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Jid.SetTo(paramsDotJidVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "jid",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // PingParams is parameters of Ping operation.
 type PingParams struct {
 	Message OptString

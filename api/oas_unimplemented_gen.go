@@ -13,6 +13,15 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// JobDetail implements JobDetail operation.
+//
+// Get job detail.
+//
+// GET /api/job/detail
+func (UnimplementedHandler) JobDetail(ctx context.Context, params JobDetailParams) (r JobDetailRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ListJob implements ListJob operation.
 //
 // List jobs.

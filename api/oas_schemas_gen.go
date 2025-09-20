@@ -28,9 +28,10 @@ func (s *ApiErrorAuthError) SetMessage(val string) {
 	s.Message = val
 }
 
-func (*ApiErrorAuthError) listJobRes() {}
-func (*ApiErrorAuthError) pingRes()    {}
-func (*ApiErrorAuthError) runJobRes()  {}
+func (*ApiErrorAuthError) jobDetailRes() {}
+func (*ApiErrorAuthError) listJobRes()   {}
+func (*ApiErrorAuthError) pingRes()      {}
+func (*ApiErrorAuthError) runJobRes()    {}
 
 // Ref: #/components/schemas/ApiErrorGenericError
 type ApiErrorGenericError struct {
@@ -109,6 +110,84 @@ func (s *Job) SetStepCount(val OptInt32) {
 func (s *Job) SetExitcode(val OptInt32) {
 	s.Exitcode = val
 }
+
+// Ref: #/components/schemas/JobDetail
+type JobDetail struct {
+	// Job id.
+	Jid OptString `json:"jid"`
+	// Run id.
+	LatestRunid OptString `json:"latest_runid"`
+	// Number of steps.
+	StepCount OptInt32 `json:"step_count"`
+	// Last run exit code.
+	Exitcode OptInt32 `json:"exitcode"`
+}
+
+// GetJid returns the value of Jid.
+func (s *JobDetail) GetJid() OptString {
+	return s.Jid
+}
+
+// GetLatestRunid returns the value of LatestRunid.
+func (s *JobDetail) GetLatestRunid() OptString {
+	return s.LatestRunid
+}
+
+// GetStepCount returns the value of StepCount.
+func (s *JobDetail) GetStepCount() OptInt32 {
+	return s.StepCount
+}
+
+// GetExitcode returns the value of Exitcode.
+func (s *JobDetail) GetExitcode() OptInt32 {
+	return s.Exitcode
+}
+
+// SetJid sets the value of Jid.
+func (s *JobDetail) SetJid(val OptString) {
+	s.Jid = val
+}
+
+// SetLatestRunid sets the value of LatestRunid.
+func (s *JobDetail) SetLatestRunid(val OptString) {
+	s.LatestRunid = val
+}
+
+// SetStepCount sets the value of StepCount.
+func (s *JobDetail) SetStepCount(val OptInt32) {
+	s.StepCount = val
+}
+
+// SetExitcode sets the value of Exitcode.
+func (s *JobDetail) SetExitcode(val OptInt32) {
+	s.Exitcode = val
+}
+
+type JobDetailBadRequest ApiErrorGenericError
+
+func (*JobDetailBadRequest) jobDetailRes() {}
+
+type JobDetailInternalServerError ApiErrorGenericError
+
+func (*JobDetailInternalServerError) jobDetailRes() {}
+
+// Ref: #/components/schemas/JobDetailResponse
+type JobDetailResponse struct {
+	// Bucket name.
+	Jobs []JobDetail `json:"jobs"`
+}
+
+// GetJobs returns the value of Jobs.
+func (s *JobDetailResponse) GetJobs() []JobDetail {
+	return s.Jobs
+}
+
+// SetJobs sets the value of Jobs.
+func (s *JobDetailResponse) SetJobs(val []JobDetail) {
+	s.Jobs = val
+}
+
+func (*JobDetailResponse) jobDetailRes() {}
 
 type ListJobBadRequest ApiErrorGenericError
 

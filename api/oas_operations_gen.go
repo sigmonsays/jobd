@@ -6,7 +6,8 @@ package api
 type OperationName = string
 
 const (
-	ListJobOperation OperationName = "ListJob"
-	PingOperation    OperationName = "Ping"
-	RunJobOperation  OperationName = "RunJob"
+	JobDetailOperation OperationName = "JobDetail"
+	ListJobOperation   OperationName = "ListJob"
+	PingOperation      OperationName = "Ping"
+	RunJobOperation    OperationName = "RunJob"
 )

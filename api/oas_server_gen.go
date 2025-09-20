@@ -8,6 +8,12 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// JobDetail implements JobDetail operation.
+	//
+	// Get job detail.
+	//
+	// GET /api/job/detail
+	JobDetail(ctx context.Context, params JobDetailParams) (JobDetailRes, error)
 	// ListJob implements ListJob operation.
 	//
 	// List jobs.
