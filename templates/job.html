@@ -35,7 +35,9 @@ job is not scheduled
 <h2>Latest Run Detail</h2>
 
 <div style="overflow: auto;">
-{{ .RunSpec.GetLastLogs 1000 | nl2br }}
+<textarea id=console style="width: 100%; height: 50%;">
+{{ .RunSpec.GetLastLogs 1000 }}
+</textarea>
 </div>
 
 

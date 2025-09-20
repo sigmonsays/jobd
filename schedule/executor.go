@@ -98,6 +98,9 @@ func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error 
 	os.WriteFile(resultFile, rbuf, 0644)
 	slog.Debug("wrote preliminary result.json file", "result_file", resultFile)
 
+	// set result internally be aware
+	me.SetResult(jid, runid, res)
+
 	if opts.Stackable == false {
 		// claim this slot so it only runs once
 		err := me.claimJid(jid)
@@ -129,17 +132,25 @@ func (me *Executor) Execute(jid string, f Runnable, opts *ExecuteOptions) error 
 
 	slog.Debug("Execute job return", "jid", jid, "result", res)
 
+	// finalize the result
+	res.Incomplete = false
+
 	// save results on disk
 	rbuf, _ = json.Marshal(res)
 	os.WriteFile(resultFile, rbuf, 0644)
 	slog.Debug("saved results file", "jid", jid, "result_file", resultFile)
 
-	// save results ni memory
+	me.SetResult(jid, runid, res)
+
+	return err
+}
+
+// save results in memory
+func (me *Executor) SetResult(jid string, runid int, res *Result) error {
 	me.mx.Lock()
 	me.results[jid] = res
 	me.mx.Unlock()
-
-	return err
+	return nil
 }
 
 // if runid is zero, latest result is returned
