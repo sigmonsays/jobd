@@ -20,8 +20,8 @@ func (s *Job) Validate() error {
 		if value, ok := s.Jid.Get(); ok {
 			if err := func() error {
 				if err := (validate.String{
-					MinLength:    3,
-					MinLengthSet: true,
+					MinLength:    0,
+					MinLengthSet: false,
 					MaxLength:    63,
 					MaxLengthSet: true,
 					Email:        false,

@@ -222,7 +222,6 @@ components:
           description: job id
           type: string
           maxLength: 63
-          minLength: 3
         nsteps:
           type: integer
           format: int32
