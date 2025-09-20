@@ -62,6 +62,8 @@ func (s *ApiErrorGenericError) SetMessage(val string) {
 type Job struct {
 	// Job id.
 	Jid OptString `json:"jid"`
+	// Run id.
+	LatestRunid OptString `json:"latest_runid"`
 	// Number of steps.
 	StepCount OptInt32 `json:"step_count"`
 	// Last run exit code.
@@ -71,6 +73,11 @@ type Job struct {
 // GetJid returns the value of Jid.
 func (s *Job) GetJid() OptString {
 	return s.Jid
+}
+
+// GetLatestRunid returns the value of LatestRunid.
+func (s *Job) GetLatestRunid() OptString {
+	return s.LatestRunid
 }
 
 // GetStepCount returns the value of StepCount.
@@ -86,6 +93,11 @@ func (s *Job) GetExitcode() OptInt32 {
 // SetJid sets the value of Jid.
 func (s *Job) SetJid(val OptString) {
 	s.Jid = val
+}
+
+// SetLatestRunid sets the value of LatestRunid.
+func (s *Job) SetLatestRunid(val OptString) {
+	s.LatestRunid = val
 }
 
 // SetStepCount sets the value of StepCount.

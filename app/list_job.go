@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	"github.com/sigmonsays/jobd/api"
@@ -34,7 +35,7 @@ func (me *Api) ListJob(context context.Context) (api.ListJobRes, error) {
 			job.Exitcode.SetTo(-1)
 		} else {
 			job.Exitcode.SetTo(int32(jres.ExitCode))
-
+			job.LatestRunid.SetTo(fmt.Sprintf("%d", jres.RunSpec.RunId))
 		}
 		// todo: Lots of missing fields
 		// todo: jcfg.Steps

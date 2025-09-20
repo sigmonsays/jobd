@@ -254,6 +254,12 @@ func (s *Job) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.LatestRunid.Set {
+			e.FieldStart("latest_runid")
+			s.LatestRunid.Encode(e)
+		}
+	}
+	{
 		if s.StepCount.Set {
 			e.FieldStart("step_count")
 			s.StepCount.Encode(e)
@@ -267,10 +273,11 @@ func (s *Job) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfJob = [3]string{
+var jsonFieldsNameOfJob = [4]string{
 	0: "jid",
-	1: "step_count",
-	2: "exitcode",
+	1: "latest_runid",
+	2: "step_count",
+	3: "exitcode",
 }
 
 // Decode decodes Job from json.
@@ -290,6 +297,16 @@ func (s *Job) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"jid\"")
+			}
+		case "latest_runid":
+			if err := func() error {
+				s.LatestRunid.Reset()
+				if err := s.LatestRunid.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"latest_runid\"")
 			}
 		case "step_count":
 			if err := func() error {

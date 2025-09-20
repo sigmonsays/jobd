@@ -222,6 +222,9 @@ components:
           description: job id
           type: string
           maxLength: 63
+        latest_runid:
+          description: run id
+          type: string
         step_count:
           type: integer
           format: int32
