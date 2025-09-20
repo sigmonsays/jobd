@@ -28,7 +28,7 @@ func (me *Api) ListJob(context context.Context) (api.ListJobRes, error) {
 
 		job := &api.Job{}
 		job.Jid.SetTo(jid)
-		job.Nsteps.SetTo(int32(len(jcfg.Steps)))
+		job.StepCount.SetTo(int32(len(jcfg.Steps)))
 
 		if jres == nil {
 			job.Exitcode.SetTo(-1)

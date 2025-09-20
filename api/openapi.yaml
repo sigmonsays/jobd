@@ -222,7 +222,7 @@ components:
           description: job id
           type: string
           maxLength: 63
-        nsteps:
+        step_count:
           type: integer
           format: int32
           description: number of steps

@@ -254,9 +254,9 @@ func (s *Job) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Nsteps.Set {
-			e.FieldStart("nsteps")
-			s.Nsteps.Encode(e)
+		if s.StepCount.Set {
+			e.FieldStart("step_count")
+			s.StepCount.Encode(e)
 		}
 	}
 	{
@@ -269,7 +269,7 @@ func (s *Job) encodeFields(e *jx.Encoder) {
 
 var jsonFieldsNameOfJob = [3]string{
 	0: "jid",
-	1: "nsteps",
+	1: "step_count",
 	2: "exitcode",
 }
 
@@ -291,15 +291,15 @@ func (s *Job) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"jid\"")
 			}
-		case "nsteps":
+		case "step_count":
 			if err := func() error {
-				s.Nsteps.Reset()
-				if err := s.Nsteps.Decode(d); err != nil {
+				s.StepCount.Reset()
+				if err := s.StepCount.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"nsteps\"")
+				return errors.Wrap(err, "decode field \"step_count\"")
 			}
 		case "exitcode":
 			if err := func() error {

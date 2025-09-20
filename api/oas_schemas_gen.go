@@ -63,7 +63,7 @@ type Job struct {
 	// Job id.
 	Jid OptString `json:"jid"`
 	// Number of steps.
-	Nsteps OptInt32 `json:"nsteps"`
+	StepCount OptInt32 `json:"step_count"`
 	// Last run exit code.
 	Exitcode OptInt32 `json:"exitcode"`
 }
@@ -73,9 +73,9 @@ func (s *Job) GetJid() OptString {
 	return s.Jid
 }
 
-// GetNsteps returns the value of Nsteps.
-func (s *Job) GetNsteps() OptInt32 {
-	return s.Nsteps
+// GetStepCount returns the value of StepCount.
+func (s *Job) GetStepCount() OptInt32 {
+	return s.StepCount
 }
 
 // GetExitcode returns the value of Exitcode.
@@ -88,9 +88,9 @@ func (s *Job) SetJid(val OptString) {
 	s.Jid = val
 }
 
-// SetNsteps sets the value of Nsteps.
-func (s *Job) SetNsteps(val OptInt32) {
-	s.Nsteps = val
+// SetStepCount sets the value of StepCount.
+func (s *Job) SetStepCount(val OptInt32) {
+	s.StepCount = val
 }
 
 // SetExitcode sets the value of Exitcode.
