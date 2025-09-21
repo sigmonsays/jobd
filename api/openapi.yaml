@@ -283,6 +283,30 @@ components:
         runid:
           description: run id
           type: string
+        globals:
+          type: object
+          additionalProperties:
+            type: string
+        steps:
+          type: object
+          additionalProperties:
+            type: string
+
+    Step:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+
+    Var:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
 
     # ---- ListJob -------
 

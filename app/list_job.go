@@ -57,5 +57,12 @@ func JobFromApi(jcfg *job.JobSpec, jres *schedule.Result) *api.Job {
 func RunFromApi(runSpec *job.RunSpec) *api.Run {
 	ret := &api.Run{}
 	ret.Runid.SetTo(fmt.Sprintf("%d", runSpec.RunId))
+
+	m := make(map[string]string, 0)
+	for k, v := range runSpec.Vars.Global.GetMap() {
+		m[k] = v.String()
+	}
+	ret.Globals.SetTo(m)
+
 	return ret
 }

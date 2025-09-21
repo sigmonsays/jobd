@@ -41,6 +41,10 @@ type VarSet struct {
 	Vars map[string]Var
 }
 
+func (me *VarSet) GetMap() map[string]Var {
+	return me.Vars
+}
+
 func (me *VarSet) SetVar(k, v string) {
 	me.Vars[k] = Var(v)
 }

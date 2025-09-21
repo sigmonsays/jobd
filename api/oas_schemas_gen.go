@@ -323,6 +323,98 @@ func (o OptRun) Or(d Run) Run {
 	return d
 }
 
+// NewOptRunGlobals returns new OptRunGlobals with value set to v.
+func NewOptRunGlobals(v RunGlobals) OptRunGlobals {
+	return OptRunGlobals{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptRunGlobals is optional RunGlobals.
+type OptRunGlobals struct {
+	Value RunGlobals
+	Set   bool
+}
+
+// IsSet returns true if OptRunGlobals was set.
+func (o OptRunGlobals) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptRunGlobals) Reset() {
+	var v RunGlobals
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptRunGlobals) SetTo(v RunGlobals) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptRunGlobals) Get() (v RunGlobals, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptRunGlobals) Or(d RunGlobals) RunGlobals {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptRunSteps returns new OptRunSteps with value set to v.
+func NewOptRunSteps(v RunSteps) OptRunSteps {
+	return OptRunSteps{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptRunSteps is optional RunSteps.
+type OptRunSteps struct {
+	Value RunSteps
+	Set   bool
+}
+
+// IsSet returns true if OptRunSteps was set.
+func (o OptRunSteps) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptRunSteps) Reset() {
+	var v RunSteps
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptRunSteps) SetTo(v RunSteps) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptRunSteps) Get() (v RunSteps, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptRunSteps) Or(d RunSteps) RunSteps {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -398,7 +490,9 @@ func (*PingResponse) pingRes() {}
 // Ref: #/components/schemas/Run
 type Run struct {
 	// Run id.
-	Runid OptString `json:"runid"`
+	Runid   OptString     `json:"runid"`
+	Globals OptRunGlobals `json:"globals"`
+	Steps   OptRunSteps   `json:"steps"`
 }
 
 // GetRunid returns the value of Runid.
@@ -406,9 +500,40 @@ func (s *Run) GetRunid() OptString {
 	return s.Runid
 }
 
+// GetGlobals returns the value of Globals.
+func (s *Run) GetGlobals() OptRunGlobals {
+	return s.Globals
+}
+
+// GetSteps returns the value of Steps.
+func (s *Run) GetSteps() OptRunSteps {
+	return s.Steps
+}
+
 // SetRunid sets the value of Runid.
 func (s *Run) SetRunid(val OptString) {
 	s.Runid = val
+}
+
+// SetGlobals sets the value of Globals.
+func (s *Run) SetGlobals(val OptRunGlobals) {
+	s.Globals = val
+}
+
+// SetSteps sets the value of Steps.
+func (s *Run) SetSteps(val OptRunSteps) {
+	s.Steps = val
+}
+
+type RunGlobals map[string]string
+
+func (s *RunGlobals) init() RunGlobals {
+	m := *s
+	if m == nil {
+		m = map[string]string{}
+		*s = m
+	}
+	return m
 }
 
 type RunJobBadRequest ApiErrorGenericError
@@ -456,3 +581,14 @@ func (*RunJobResponse) runJobRes() {}
 type RunJobUnauthorized ApiErrorGenericError
 
 func (*RunJobUnauthorized) runJobRes() {}
+
+type RunSteps map[string]string
+
+func (s *RunSteps) init() RunSteps {
+	m := *s
+	if m == nil {
+		m = map[string]string{}
+		*s = m
+	}
+	return m
+}
