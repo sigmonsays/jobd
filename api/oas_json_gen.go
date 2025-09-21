@@ -450,6 +450,12 @@ func (s *JobDetailResponse) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.OutputFile.Set {
+			e.FieldStart("output_file")
+			s.OutputFile.Encode(e)
+		}
+	}
+	{
 		if s.Output.Set {
 			e.FieldStart("output")
 			s.Output.Encode(e)
@@ -457,10 +463,11 @@ func (s *JobDetailResponse) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfJobDetailResponse = [3]string{
+var jsonFieldsNameOfJobDetailResponse = [4]string{
 	0: "job",
 	1: "run",
-	2: "output",
+	2: "output_file",
+	3: "output",
 }
 
 // Decode decodes JobDetailResponse from json.
@@ -490,6 +497,16 @@ func (s *JobDetailResponse) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"run\"")
+			}
+		case "output_file":
+			if err := func() error {
+				s.OutputFile.Reset()
+				if err := s.OutputFile.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"output_file\"")
 			}
 		case "output":
 			if err := func() error {
@@ -521,6 +538,145 @@ func (s *JobDetailResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *JobDetailResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes JobOutputBadRequest as json.
+func (s *JobOutputBadRequest) Encode(e *jx.Encoder) {
+	unwrapped := (*ApiErrorGenericError)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes JobOutputBadRequest from json.
+func (s *JobOutputBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobOutputBadRequest to nil")
+	}
+	var unwrapped ApiErrorGenericError
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = JobOutputBadRequest(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobOutputBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobOutputBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes JobOutputInternalServerError as json.
+func (s *JobOutputInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*ApiErrorGenericError)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes JobOutputInternalServerError from json.
+func (s *JobOutputInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobOutputInternalServerError to nil")
+	}
+	var unwrapped ApiErrorGenericError
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = JobOutputInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobOutputInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobOutputInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobOutputResponse) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobOutputResponse) encodeFields(e *jx.Encoder) {
+	{
+		if s.Output.Set {
+			e.FieldStart("output")
+			s.Output.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfJobOutputResponse = [1]string{
+	0: "output",
+}
+
+// Decode decodes JobOutputResponse from json.
+func (s *JobOutputResponse) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobOutputResponse to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "output":
+			if err := func() error {
+				s.Output.Reset()
+				if err := s.Output.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"output\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobOutputResponse")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobOutputResponse) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobOutputResponse) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

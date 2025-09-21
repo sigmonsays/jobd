@@ -7,9 +7,9 @@ import (
 	"github.com/sigmonsays/jobd/api"
 )
 
-func (me *Api) JobDetail(context context.Context, params api.JobDetailParams) (api.JobDetailRes, error) {
+func (me *Api) JobOutput(context context.Context, params api.JobOutputParams) (api.JobOutputRes, error) {
 
-	ret := &api.JobDetailResponse{}
+	ret := &api.JobOutputResponse{}
 
 	jid := params.Jid.Value
 	jcfg, err := me.JobConfig.GetConfig(jid)
@@ -21,15 +21,10 @@ func (me *Api) JobDetail(context context.Context, params api.JobDetailParams) (a
 	jres, err := me.Executor.GetResult(jid, 0)
 	if err != nil {
 		slog.Debug("GetResult error", "jid", jid, "err", err)
+		return nil, err
 	}
-	job := JobFromApi(jcfg, jres)
 
-	ret.Job.SetTo(*job)
-
-	run := RunFromApi(jres.RunSpec)
-
-	out := jres.RunSpec.GetLogFile()
-	ret.OutputFile.SetTo(out)
+	_ = jcfg
 
 	lines, err := jres.RunSpec.GetLastLogs(1000)
 	if err != nil {
@@ -37,11 +32,6 @@ func (me *Api) JobDetail(context context.Context, params api.JobDetailParams) (a
 		return nil, err
 	}
 	ret.Output.SetTo(lines)
-
-	ret.Run.SetTo(*run)
-
-	_ = jres
-	_ = jcfg
 
 	return ret, nil
 }

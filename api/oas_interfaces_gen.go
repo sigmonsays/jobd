@@ -5,6 +5,10 @@ type JobDetailRes interface {
 	jobDetailRes()
 }
 
+type JobOutputRes interface {
+	jobOutputRes()
+}
+
 type ListJobRes interface {
 	listJobRes()
 }

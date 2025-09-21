@@ -99,6 +99,34 @@ paths:
         '500':
           $ref: '#/components/responses/GenericError'
 
+  /api/job/output:
+    # JobOutput api-path GET /api/job/output
+    get:
+      summary: JobOutput
+      description: get job output
+      operationId: JobOutput
+      tags:
+        - job
+      parameters:
+        - in: query
+          name: jid
+          description: job id
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobOutputResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/AuthenticationError'
+        '500':
+          $ref: '#/components/responses/GenericError'
+
   /api/job/run:
 
     #RunJob api-path POST /api/job
@@ -374,6 +402,23 @@ components:
           $ref: '#/components/schemas/Job'
         run:
           $ref: '#/components/schemas/Run'
+        output_file:
+          type: string
+          description: job output file path
         output:
           type: string
-          description: job status
+          description: job output
+
+    # ---- JobOutput -------
+
+    JobOutputResponse:
+      #x-ogen-json-streaming: true
+      # schema:
+      #   type: array
+      #   items:
+      #     type: string
+      type: object
+      properties:
+        output:
+          type: string
+          description: job output

@@ -22,6 +22,15 @@ func (UnimplementedHandler) JobDetail(ctx context.Context, params JobDetailParam
 	return r, ht.ErrNotImplemented
 }
 
+// JobOutput implements JobOutput operation.
+//
+// Get job output.
+//
+// GET /api/job/output
+func (UnimplementedHandler) JobOutput(ctx context.Context, params JobOutputParams) (r JobOutputRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ListJob implements ListJob operation.
 //
 // List jobs.

@@ -7,6 +7,7 @@ type OperationName = string
 
 const (
 	JobDetailOperation OperationName = "JobDetail"
+	JobOutputOperation OperationName = "JobOutput"
 	ListJobOperation   OperationName = "ListJob"
 	PingOperation      OperationName = "Ping"
 	RunJobOperation    OperationName = "RunJob"

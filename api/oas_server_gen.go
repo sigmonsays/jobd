@@ -14,6 +14,12 @@ type Handler interface {
 	//
 	// GET /api/job/detail
 	JobDetail(ctx context.Context, params JobDetailParams) (JobDetailRes, error)
+	// JobOutput implements JobOutput operation.
+	//
+	// Get job output.
+	//
+	// GET /api/job/output
+	JobOutput(ctx context.Context, params JobOutputParams) (JobOutputRes, error)
 	// ListJob implements ListJob operation.
 	//
 	// List jobs.

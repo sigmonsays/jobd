@@ -29,6 +29,7 @@ func (s *ApiErrorAuthError) SetMessage(val string) {
 }
 
 func (*ApiErrorAuthError) jobDetailRes() {}
+func (*ApiErrorAuthError) jobOutputRes() {}
 func (*ApiErrorAuthError) listJobRes()   {}
 func (*ApiErrorAuthError) pingRes()      {}
 func (*ApiErrorAuthError) runJobRes()    {}
@@ -123,7 +124,9 @@ func (*JobDetailInternalServerError) jobDetailRes() {}
 type JobDetailResponse struct {
 	Job OptJob `json:"job"`
 	Run OptRun `json:"run"`
-	// Job status.
+	// Job output file path.
+	OutputFile OptString `json:"output_file"`
+	// Job output.
 	Output OptString `json:"output"`
 }
 
@@ -135,6 +138,11 @@ func (s *JobDetailResponse) GetJob() OptJob {
 // GetRun returns the value of Run.
 func (s *JobDetailResponse) GetRun() OptRun {
 	return s.Run
+}
+
+// GetOutputFile returns the value of OutputFile.
+func (s *JobDetailResponse) GetOutputFile() OptString {
+	return s.OutputFile
 }
 
 // GetOutput returns the value of Output.
@@ -152,12 +160,43 @@ func (s *JobDetailResponse) SetRun(val OptRun) {
 	s.Run = val
 }
 
+// SetOutputFile sets the value of OutputFile.
+func (s *JobDetailResponse) SetOutputFile(val OptString) {
+	s.OutputFile = val
+}
+
 // SetOutput sets the value of Output.
 func (s *JobDetailResponse) SetOutput(val OptString) {
 	s.Output = val
 }
 
 func (*JobDetailResponse) jobDetailRes() {}
+
+type JobOutputBadRequest ApiErrorGenericError
+
+func (*JobOutputBadRequest) jobOutputRes() {}
+
+type JobOutputInternalServerError ApiErrorGenericError
+
+func (*JobOutputInternalServerError) jobOutputRes() {}
+
+// Ref: #/components/schemas/JobOutputResponse
+type JobOutputResponse struct {
+	// Job output.
+	Output OptString `json:"output"`
+}
+
+// GetOutput returns the value of Output.
+func (s *JobOutputResponse) GetOutput() OptString {
+	return s.Output
+}
+
+// SetOutput sets the value of Output.
+func (s *JobOutputResponse) SetOutput(val OptString) {
+	s.Output = val
+}
+
+func (*JobOutputResponse) jobOutputRes() {}
 
 type ListJobBadRequest ApiErrorGenericError
 

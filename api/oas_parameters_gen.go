@@ -76,6 +76,71 @@ func decodeJobDetailParams(args [0]string, argsEscaped bool, r *http.Request) (p
 	return params, nil
 }
 
+// JobOutputParams is parameters of JobOutput operation.
+type JobOutputParams struct {
+	// Job id.
+	Jid OptString
+}
+
+func unpackJobOutputParams(packed middleware.Parameters) (params JobOutputParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "jid",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Jid = v.(OptString)
+		}
+	}
+	return params
+}
+
+func decodeJobOutputParams(args [0]string, argsEscaped bool, r *http.Request) (params JobOutputParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: jid.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "jid",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotJidVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotJidVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Jid.SetTo(paramsDotJidVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "jid",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // PingParams is parameters of Ping operation.
 type PingParams struct {
 	Message OptString

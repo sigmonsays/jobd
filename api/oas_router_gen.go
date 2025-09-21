@@ -111,6 +111,26 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							return
 						}
 
+					case 'o': // Prefix: "output"
+
+						if l := len("output"); len(elem) >= l && elem[0:l] == "output" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleJobOutputRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
 					case 'r': // Prefix: "run"
 
 						if l := len("run"); len(elem) >= l && elem[0:l] == "run" {
@@ -300,6 +320,30 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								r.summary = "JobDetail"
 								r.operationID = "JobDetail"
 								r.pathPattern = "/api/job/detail"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+					case 'o': // Prefix: "output"
+
+						if l := len("output"); len(elem) >= l && elem[0:l] == "output" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = JobOutputOperation
+								r.summary = "JobOutput"
+								r.operationID = "JobOutput"
+								r.pathPattern = "/api/job/output"
 								r.args = args
 								r.count = 0
 								return r, true
