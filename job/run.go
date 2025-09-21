@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/sigmonsays/jobd/git"
 	"github.com/sigmonsays/jobd/util"
@@ -64,6 +65,8 @@ func Run(job *JobSpec) (*RunSpec, error) {
 		}
 	}
 
+	now := time.Now()
+
 	// make vars api
 	vars := NewVars(job.VarPrefix)
 	vars.Global.SetVar("JOBID", job.JobId)
@@ -107,8 +110,9 @@ func Run(job *JobSpec) (*RunSpec, error) {
 	defer outfh.Close()
 
 	// log line for job
-	runSpec.Logf("run job jid:%s runid:%d",
-		job.JobId, runSpec.RunId)
+	runSpec.Logf("run job jid:%s runid:%d date:%s",
+		job.JobId, runSpec.RunId, now.Format(time.RFC3339),
+	)
 
 	for step_idx, _step := range job.Steps {
 		step := _step.Copy()
