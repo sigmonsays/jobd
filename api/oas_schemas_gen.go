@@ -111,58 +111,6 @@ func (s *Job) SetExitcode(val OptInt32) {
 	s.Exitcode = val
 }
 
-// Ref: #/components/schemas/JobDetail
-type JobDetail struct {
-	// Job id.
-	Jid OptString `json:"jid"`
-	// Run id.
-	LatestRunid OptString `json:"latest_runid"`
-	// Number of steps.
-	StepCount OptInt32 `json:"step_count"`
-	// Last run exit code.
-	Exitcode OptInt32 `json:"exitcode"`
-}
-
-// GetJid returns the value of Jid.
-func (s *JobDetail) GetJid() OptString {
-	return s.Jid
-}
-
-// GetLatestRunid returns the value of LatestRunid.
-func (s *JobDetail) GetLatestRunid() OptString {
-	return s.LatestRunid
-}
-
-// GetStepCount returns the value of StepCount.
-func (s *JobDetail) GetStepCount() OptInt32 {
-	return s.StepCount
-}
-
-// GetExitcode returns the value of Exitcode.
-func (s *JobDetail) GetExitcode() OptInt32 {
-	return s.Exitcode
-}
-
-// SetJid sets the value of Jid.
-func (s *JobDetail) SetJid(val OptString) {
-	s.Jid = val
-}
-
-// SetLatestRunid sets the value of LatestRunid.
-func (s *JobDetail) SetLatestRunid(val OptString) {
-	s.LatestRunid = val
-}
-
-// SetStepCount sets the value of StepCount.
-func (s *JobDetail) SetStepCount(val OptInt32) {
-	s.StepCount = val
-}
-
-// SetExitcode sets the value of Exitcode.
-func (s *JobDetail) SetExitcode(val OptInt32) {
-	s.Exitcode = val
-}
-
 type JobDetailBadRequest ApiErrorGenericError
 
 func (*JobDetailBadRequest) jobDetailRes() {}
@@ -173,18 +121,29 @@ func (*JobDetailInternalServerError) jobDetailRes() {}
 
 // Ref: #/components/schemas/JobDetailResponse
 type JobDetailResponse struct {
-	// Bucket name.
-	Jobs []JobDetail `json:"jobs"`
+	Job OptJob `json:"job"`
+	// Job status.
+	Output OptString `json:"output"`
 }
 
-// GetJobs returns the value of Jobs.
-func (s *JobDetailResponse) GetJobs() []JobDetail {
-	return s.Jobs
+// GetJob returns the value of Job.
+func (s *JobDetailResponse) GetJob() OptJob {
+	return s.Job
 }
 
-// SetJobs sets the value of Jobs.
-func (s *JobDetailResponse) SetJobs(val []JobDetail) {
-	s.Jobs = val
+// GetOutput returns the value of Output.
+func (s *JobDetailResponse) GetOutput() OptString {
+	return s.Output
+}
+
+// SetJob sets the value of Job.
+func (s *JobDetailResponse) SetJob(val OptJob) {
+	s.Job = val
+}
+
+// SetOutput sets the value of Output.
+func (s *JobDetailResponse) SetOutput(val OptString) {
+	s.Output = val
 }
 
 func (*JobDetailResponse) jobDetailRes() {}
@@ -255,6 +214,52 @@ func (o OptInt32) Get() (v int32, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt32) Or(d int32) int32 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJob returns new OptJob with value set to v.
+func NewOptJob(v Job) OptJob {
+	return OptJob{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJob is optional Job.
+type OptJob struct {
+	Value Job
+	Set   bool
+}
+
+// IsSet returns true if OptJob was set.
+func (o OptJob) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJob) Reset() {
+	var v Job
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJob) SetTo(v Job) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJob) Get() (v Job, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJob) Or(d Job) Job {
 	if v, ok := o.Get(); ok {
 		return v
 	}

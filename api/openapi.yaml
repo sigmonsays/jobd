@@ -265,11 +265,7 @@ components:
     JobDetail:
       type: object
       properties:
-        jid:
-          description: job id
-          type: string
-          maxLength: 63
-        latest_runid:
+        job:
           description: run id
           type: string
         step_count:
@@ -344,8 +340,8 @@ components:
     JobDetailResponse:
       type: object
       properties:
-        jobs:
-          type: array
-          description: bucket name
-          items:
-            $ref: '#/components/schemas/JobDetail'
+        job:
+          $ref: '#/components/schemas/Job'
+        output:
+          type: string
+          description: job status

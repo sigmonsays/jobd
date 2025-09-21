@@ -352,120 +352,6 @@ func (s *Job) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode implements json.Marshaler.
-func (s *JobDetail) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *JobDetail) encodeFields(e *jx.Encoder) {
-	{
-		if s.Jid.Set {
-			e.FieldStart("jid")
-			s.Jid.Encode(e)
-		}
-	}
-	{
-		if s.LatestRunid.Set {
-			e.FieldStart("latest_runid")
-			s.LatestRunid.Encode(e)
-		}
-	}
-	{
-		if s.StepCount.Set {
-			e.FieldStart("step_count")
-			s.StepCount.Encode(e)
-		}
-	}
-	{
-		if s.Exitcode.Set {
-			e.FieldStart("exitcode")
-			s.Exitcode.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfJobDetail = [4]string{
-	0: "jid",
-	1: "latest_runid",
-	2: "step_count",
-	3: "exitcode",
-}
-
-// Decode decodes JobDetail from json.
-func (s *JobDetail) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode JobDetail to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "jid":
-			if err := func() error {
-				s.Jid.Reset()
-				if err := s.Jid.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"jid\"")
-			}
-		case "latest_runid":
-			if err := func() error {
-				s.LatestRunid.Reset()
-				if err := s.LatestRunid.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"latest_runid\"")
-			}
-		case "step_count":
-			if err := func() error {
-				s.StepCount.Reset()
-				if err := s.StepCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"step_count\"")
-			}
-		case "exitcode":
-			if err := func() error {
-				s.Exitcode.Reset()
-				if err := s.Exitcode.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"exitcode\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode JobDetail")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *JobDetail) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobDetail) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes JobDetailBadRequest as json.
 func (s *JobDetailBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := (*ApiErrorGenericError)(s)
@@ -552,19 +438,22 @@ func (s *JobDetailResponse) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *JobDetailResponse) encodeFields(e *jx.Encoder) {
 	{
-		if s.Jobs != nil {
-			e.FieldStart("jobs")
-			e.ArrStart()
-			for _, elem := range s.Jobs {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+		if s.Job.Set {
+			e.FieldStart("job")
+			s.Job.Encode(e)
+		}
+	}
+	{
+		if s.Output.Set {
+			e.FieldStart("output")
+			s.Output.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfJobDetailResponse = [1]string{
-	0: "jobs",
+var jsonFieldsNameOfJobDetailResponse = [2]string{
+	0: "job",
+	1: "output",
 }
 
 // Decode decodes JobDetailResponse from json.
@@ -575,22 +464,25 @@ func (s *JobDetailResponse) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "jobs":
+		case "job":
 			if err := func() error {
-				s.Jobs = make([]JobDetail, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem JobDetail
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Jobs = append(s.Jobs, elem)
-					return nil
-				}); err != nil {
+				s.Job.Reset()
+				if err := s.Job.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"jobs\"")
+				return errors.Wrap(err, "decode field \"job\"")
+			}
+		case "output":
+			if err := func() error {
+				s.Output.Reset()
+				if err := s.Output.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"output\"")
 			}
 		default:
 			return d.Skip()
@@ -797,6 +689,39 @@ func (s OptInt32) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptInt32) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes Job as json.
+func (o OptJob) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes Job from json.
+func (o *OptJob) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptJob to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptJob) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptJob) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

@@ -6,6 +6,8 @@ import (
 	"log/slog"
 
 	"github.com/sigmonsays/jobd/api"
+	"github.com/sigmonsays/jobd/job"
+	"github.com/sigmonsays/jobd/schedule"
 )
 
 func (me *Api) ListJob(context context.Context) (api.ListJobRes, error) {
@@ -27,22 +29,26 @@ func (me *Api) ListJob(context context.Context) (api.ListJobRes, error) {
 			slog.Debug("GetResult error", "jid", jid, "err", err)
 		}
 
-		job := &api.Job{}
-		job.Jid.SetTo(jid)
-		job.StepCount.SetTo(int32(len(jcfg.Steps)))
-
-		if jres == nil {
-			job.Exitcode.SetTo(-1)
-		} else {
-			job.Exitcode.SetTo(int32(jres.ExitCode))
-			job.LatestRunid.SetTo(fmt.Sprintf("%d", jres.RunSpec.RunId))
-		}
-		// todo: Lots of missing fields
-		// todo: jcfg.Steps
+		job := JobFromApi(jcfg, jres)
 
 		ret.Jobs = append(ret.Jobs, *job)
 
 	}
 
 	return ret, nil
+}
+func JobFromApi(jcfg *job.JobSpec, jres *schedule.Result) *api.Job {
+	job := &api.Job{}
+	job.Jid.SetTo(jcfg.JobId)
+	job.StepCount.SetTo(int32(len(jcfg.Steps)))
+
+	if jres == nil {
+		job.Exitcode.SetTo(-1)
+	} else {
+		job.Exitcode.SetTo(int32(jres.ExitCode))
+		job.LatestRunid.SetTo(fmt.Sprintf("%d", jres.RunSpec.RunId))
+	}
+	// todo: Lots of missing fields
+	// todo: jcfg.Steps
+	return job
 }
