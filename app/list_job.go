@@ -37,6 +37,7 @@ func (me *Api) ListJob(context context.Context) (api.ListJobRes, error) {
 
 	return ret, nil
 }
+
 func JobFromApi(jcfg *job.JobSpec, jres *schedule.Result) *api.Job {
 	job := &api.Job{}
 	job.Jid.SetTo(jcfg.JobId)
@@ -51,4 +52,10 @@ func JobFromApi(jcfg *job.JobSpec, jres *schedule.Result) *api.Job {
 	// todo: Lots of missing fields
 	// todo: jcfg.Steps
 	return job
+}
+
+func RunFromApi(runSpec *job.RunSpec) *api.Run {
+	ret := &api.Run{}
+	ret.Runid.SetTo(fmt.Sprintf("%d", runSpec.RunId))
+	return ret
 }

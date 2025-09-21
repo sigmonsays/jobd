@@ -277,6 +277,12 @@ components:
           format: int32
           description: last run exit code
 
+    Run:
+      type: object
+      properties:
+        runid:
+          description: run id
+          type: string
 
     # ---- ListJob -------
 
@@ -342,6 +348,8 @@ components:
       properties:
         job:
           $ref: '#/components/schemas/Job'
+        run:
+          $ref: '#/components/schemas/Run'
         output:
           type: string
           description: job status

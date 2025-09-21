@@ -122,6 +122,7 @@ func (*JobDetailInternalServerError) jobDetailRes() {}
 // Ref: #/components/schemas/JobDetailResponse
 type JobDetailResponse struct {
 	Job OptJob `json:"job"`
+	Run OptRun `json:"run"`
 	// Job status.
 	Output OptString `json:"output"`
 }
@@ -129,6 +130,11 @@ type JobDetailResponse struct {
 // GetJob returns the value of Job.
 func (s *JobDetailResponse) GetJob() OptJob {
 	return s.Job
+}
+
+// GetRun returns the value of Run.
+func (s *JobDetailResponse) GetRun() OptRun {
+	return s.Run
 }
 
 // GetOutput returns the value of Output.
@@ -139,6 +145,11 @@ func (s *JobDetailResponse) GetOutput() OptString {
 // SetJob sets the value of Job.
 func (s *JobDetailResponse) SetJob(val OptJob) {
 	s.Job = val
+}
+
+// SetRun sets the value of Run.
+func (s *JobDetailResponse) SetRun(val OptRun) {
+	s.Run = val
 }
 
 // SetOutput sets the value of Output.
@@ -266,6 +277,52 @@ func (o OptJob) Or(d Job) Job {
 	return d
 }
 
+// NewOptRun returns new OptRun with value set to v.
+func NewOptRun(v Run) OptRun {
+	return OptRun{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptRun is optional Run.
+type OptRun struct {
+	Value Run
+	Set   bool
+}
+
+// IsSet returns true if OptRun was set.
+func (o OptRun) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptRun) Reset() {
+	var v Run
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptRun) SetTo(v Run) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptRun) Get() (v Run, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptRun) Or(d Run) Run {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -337,6 +394,22 @@ func (s *PingResponse) SetMessage(val OptString) {
 }
 
 func (*PingResponse) pingRes() {}
+
+// Ref: #/components/schemas/Run
+type Run struct {
+	// Run id.
+	Runid OptString `json:"runid"`
+}
+
+// GetRunid returns the value of Runid.
+func (s *Run) GetRunid() OptString {
+	return s.Runid
+}
+
+// SetRunid sets the value of Runid.
+func (s *Run) SetRunid(val OptString) {
+	s.Runid = val
+}
 
 type RunJobBadRequest ApiErrorGenericError
 

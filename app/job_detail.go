@@ -26,9 +26,12 @@ func (me *Api) JobDetail(context context.Context, params api.JobDetailParams) (a
 
 	ret.Job.SetTo(*job)
 
+	run := RunFromApi(jres.RunSpec)
+
 	out := jres.RunSpec.GetLogFile()
 
 	ret.Output.SetTo(out)
+	ret.Run.SetTo(*run)
 
 	_ = jres
 	_ = jcfg
