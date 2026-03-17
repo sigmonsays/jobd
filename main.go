@@ -91,6 +91,11 @@ func run(cfg *config.AppConfig, opts *Options) error {
 		}
 	}
 
+	// if dev mode
+	if opts.DevMode {
+		slog.Info("running in dev mode")
+	}
+
 	// build api
 	ctx := &core.Context{
 		AppConfig: cfg,
